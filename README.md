@@ -1,2 +1,2 @@
-# potoaltered
+# PotoAltered
 See your cards collection
