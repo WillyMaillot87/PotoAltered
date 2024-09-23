@@ -161,5 +161,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# Notebooks
+# Other
+results
+temp
+card_images
+card_assets
 .exploration.ipynb
