@@ -19,7 +19,7 @@ CSV_OUTPUT_PATH = "data/cards_" + MAIN_LANGUAGE + ".csv"
 import os
 import csv
 import itertools
-from utils import load_json
+from src.utils import load_json
 
 def main():
     if not os.path.exists(CARDS_DATA_PATH):

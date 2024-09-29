@@ -18,7 +18,7 @@ COLLECTION_TOKEN=None
 import requests
 from typing import Dict, List
 from os.path import join
-from utils import dump_json, create_folder_if_not_exists, LANGUAGE_HEADERS
+from src.utils import dump_json, create_folder_if_not_exists, LANGUAGE_HEADERS
 
 # Constants
 ITEMS_PER_PAGE = 36

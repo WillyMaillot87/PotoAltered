@@ -1,7 +1,7 @@
 # Imports
 import os
 from os.path import join
-from utils import dump_json, create_folder_if_not_exists
+from src.utils import dump_json, create_folder_if_not_exists
 from get_cards_data import get_cards_data
 from dotenv import load_dotenv
 load_dotenv()

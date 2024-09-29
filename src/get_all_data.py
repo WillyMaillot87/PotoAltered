@@ -6,9 +6,9 @@ import pandas as pd
 import numpy as np
 
 #PARAMETERS
-ALL_CARDS_PATH = "data/cards_fr.csv"
-MY_COLLECTION_PATH = "data/collection_fr.csv"
-CSV_OUTPUT_PATH = "data/global_vision.csv"
+ALL_CARDS_PATH = "src/data/cards_fr.csv"
+MY_COLLECTION_PATH = "src/data/collection_fr.csv"
+CSV_OUTPUT_PATH = "src/data/global_vision.csv"
 
 def check_KS(id):
     '''Identify the Kickstarter edition'''
@@ -27,10 +27,10 @@ def concat_strings(col):
 def get_dataframes(all_cards_path, my_collection_path):
 
     if not os.path.exists(ALL_CARDS_PATH):
-        print(f"File {ALL_CARDS_PATH} not found. Have you run get_cards_data.py?")
+        print(f"File {ALL_CARDS_PATH} not found. Have you run get_cards_data.py and get_csv_data.py ?")
         return
     if not os.path.exists(MY_COLLECTION_PATH):
-        print(f"File {MY_COLLECTION_PATH} not found. Have you run get_cards_data.py?")
+        print(f"File {MY_COLLECTION_PATH} not found. Have you run get_collection_data.py and get_collection_data.py ?")
         return
     
     all_cards = pd.read_csv(all_cards_path)
@@ -106,7 +106,35 @@ def get_dataframes(all_cards_path, my_collection_path):
                                     'to_give',
                                     'to_get']], left_on='collectorNumber', right_on='collectorNumber', how='left')
 
+
+    new_names_fr = {'name_fr' : 'Nom', 
+             'collectorNumber' : 'Numéro de carte', 
+             'rarity' : 'Rareté',
+             'handCost' : 'Coût de main', 
+             'reserveCost' : 'Coût de réserve', 
+             'forestPower' : 'Fôret', 
+             'mountainPower' : 'Montagne', 
+             'waterPower' : 'Eau', 
+             'abilities_fr' : 'Capacité principale', 
+             'supportAbility_fr' : 'Capacité de soutien',
+             'imagePath' : 'URL image', 
+             'inMyCollection' : 'Nombre possédé', 
+             'Kickstarter' : 'Nombre de kickstarter possédé', 
+             'to_give' : 'Nombre de carte en excés', 
+             'to_get' : 'Nombre de cartes manquantes'
+    }
+
+    df = df.rename(columns = new_names_fr)
+
+    df = df[['Nom', 'faction', 'Rareté', 'type', 'Nombre possédé',
+       'Nombre de kickstarter possédé', 'Nombre de carte en excés',
+       'Nombre de cartes manquantes', 'Coût de main',
+       'Coût de réserve', 'Fôret', 'Montagne', 'Eau', 'Capacité principale',
+       'Capacité de soutien','Numéro de carte',  'id', 'URL image']]
+    
     df = df.fillna(0)
+
+    df[['Nombre possédé', 'Nombre de kickstarter possédé', 'Nombre de carte en excés', 'Nombre de cartes manquantes']] = df[['Nombre possédé', 'Nombre de kickstarter possédé', 'Nombre de carte en excés', 'Nombre de cartes manquantes']].astype('int')
 
     df.to_csv(CSV_OUTPUT_PATH, index=False)
     print(f"global_vision dataframe {df.shape} is ready ({CSV_OUTPUT_PATH})")
