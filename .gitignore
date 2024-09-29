@@ -168,3 +168,5 @@ card_images
 card_assets
 .exploration.ipynb
 TODO.txt
+data\cards_fr.csv
+data\collection_fr.csv
