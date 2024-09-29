@@ -1,6 +1,3 @@
-# Script by Maverick CHARDET
-# MIT License
-
 # Parameters
 NAME_LANGUAGES = ["fr"]
 ABILITIES_LANGUAGES = ["fr"]
