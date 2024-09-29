@@ -8,12 +8,12 @@ MAIN_LANGUAGE = "fr"
 GROUP_SUBTYPES = False
 INCLUDE_WEB_ASSETS = False
 
-CARDS_DATA_PATH = "results/cards.json"
+CARDS_DATA_PATH = "results/collection.json"
 FACTIONS_DATA_PATH = "results/factions.json"
 TYPES_DATA_PATH = "results/types.json"
 SUBTYPES_DATA_PATH = "results/subtypes.json"
 RARITIES_DATA_PATH = "results/rarities.json"
-CSV_OUTPUT_PATH = "data/cards_" + MAIN_LANGUAGE + ".csv"
+CSV_OUTPUT_PATH = "data/collection_" + MAIN_LANGUAGE + ".csv"
 
 # Imports
 import os
