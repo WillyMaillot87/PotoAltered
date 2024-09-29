@@ -2,7 +2,7 @@
 # MIT License
 
 # Parameters
-LANGUAGES = ["en", "fr", "es", "it", "de"]
+LANGUAGES = ["fr"]
 DUMP_TEMP_FILES = False
 OUTPUT_FOLDER = "results"
 TEMP_FOLDER = "temp"
@@ -29,7 +29,11 @@ def get_page(apiEndpoint, language, page, faction=None, include_uniques=INCLUDE_
         rarity_params = "rarity[]=COMMON&rarity[]=RARE"
     url = f"https://api.altered.gg/{apiEndpoint}?{rarity_params}&itemsPerPage={items_per_page}&page={page}"
     headers = {}
-    headers.update(LANGUAGE_HEADERS[language])
+    if len(language) == 1:
+        language_key = language[0]
+        headers.update(LANGUAGE_HEADERS[language_key])
+    else:
+        headers.update(LANGUAGE_HEADERS["en"])
     if collection_token:
         headers.update({"Authorization": collection_token})
         url += f"&collection=true"
@@ -229,17 +233,16 @@ def get_cards_data(
     treated_factions = {}
     treated_rarities = {}
 
-    # Collection stats are not language specific, so only load them once, if there is a collection
     raw_stats_data = []
     if collection_token:
         print("Importing stats data")
-        raw_stats_data = get_data_language("cards/stats", "en", include_uniques=include_uniques, items_per_page=items_per_page, collection_token=collection_token)
+        raw_stats_data = get_data_language("cards/stats", language=languages, include_uniques=include_uniques, items_per_page=items_per_page, collection_token=collection_token)
         if dump_temp_files:
             dump_json(raw_cards_data, join(temp_folder, 'raw_stats_data_' + language + '.json'))
 
     for language in languages:
         print("Importing card data for language " + language)
-        raw_cards_data = get_data_language("cards", language, include_uniques=include_uniques, items_per_page=items_per_page, collection_token=collection_token)
+        raw_cards_data = get_data_language("cards", language=languages, include_uniques=include_uniques, items_per_page=items_per_page, collection_token=collection_token)
         if dump_temp_files:
             dump_json(raw_cards_data, join(temp_folder, 'raw_cards_data_' + language + '.json'))
         tcards, ttypes, tsubtypes, tfactions, trarities = treat_cards_data(

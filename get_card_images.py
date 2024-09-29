@@ -2,7 +2,7 @@
 # MIT License
 
 # Parameters
-LANGUAGES = ["en", "fr", "es", "it", "de"]
+LANGUAGES = "fr"
 FORCE_REDOWNLOAD = False
 DOWNLOAD_CARD_IMAGES = True
 DOWNLOAD_ASSETS = False
