@@ -162,8 +162,8 @@ cython_debug/
 #.idea/
 
 # Other
-results/
-data/
+results
+data
 temp
 card_images
 card_assets
