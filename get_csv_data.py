@@ -8,11 +8,11 @@ MAIN_LANGUAGE = "fr"
 GROUP_SUBTYPES = False
 INCLUDE_WEB_ASSETS = False
 
-CARDS_DATA_PATH = "results/cards.json"
-FACTIONS_DATA_PATH = "results/factions.json"
-TYPES_DATA_PATH = "results/types.json"
-SUBTYPES_DATA_PATH = "results/subtypes.json"
-RARITIES_DATA_PATH = "results/rarities.json"
+CARDS_DATA_PATH = "data/cards.json"
+FACTIONS_DATA_PATH = "data/factions.json"
+TYPES_DATA_PATH = "data/types.json"
+SUBTYPES_DATA_PATH = "data/subtypes.json"
+RARITIES_DATA_PATH = "data/rarities.json"
 CSV_OUTPUT_PATH = "data/cards_" + MAIN_LANGUAGE + ".csv"
 
 # Imports

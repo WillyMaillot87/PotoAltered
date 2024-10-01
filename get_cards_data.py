@@ -4,7 +4,7 @@
 # Parameters
 LANGUAGES = ["fr"]
 DUMP_TEMP_FILES = False
-OUTPUT_FOLDER = "results"
+OUTPUT_FOLDER = "data"
 TEMP_FOLDER = "temp"
 INCLUDE_PROMO_CARDS = False
 INCLUDE_UNIQUES = False

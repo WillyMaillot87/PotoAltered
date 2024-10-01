@@ -36,8 +36,6 @@ def run():
         orientation="horizontal"
     )
 
-    df = pd.read_csv("data/global_vision.csv")
-
     # new_names_fr = {'name_fr' : 'Nom', 
     #          'collectorNumber' : 'Numéro', 
     #          'rarity' : 'Rareté',
@@ -72,7 +70,7 @@ Le token n'est pas stocké dans l'application ni en local, ni en ligne.
 
 Cette étape n'est à faire qu'une seule fois pour télécharger les données de votre collection.
                     
-Ne communiquez pas votre token à une autre personne, encore moins à Flopin !!!
+Ne communiquez votre token à personne !
                     """)
 
             mini_col1, mini_col2 = st.columns(2, vertical_alignment="bottom")
@@ -108,72 +106,110 @@ Ne communiquez pas votre token à une autre personne, encore moins à Flopin !!!
 
 ### COLLECTION PAGE ###
     if selected == "Collection" : 
-        st.header("Collection")
 
-        st.write("J'ai plein de jolies cartes <3")
+        if os.path.isfile("data/global_vision.csv") :
+            df = pd.read_csv("data/global_vision.csv")    
 
-        df_my_collection = df[df['inMyCollection'] > 0]
+            st.header("Collection")
 
-        # df_my_collection["image"] = df_my_collection["URL image"].apply(lambda x: st.image(x, width=80))
-    
-        column_configuration = {'name_fr' : 'Nom', 
-            'collectorNumber' : 'Numéro',
-            'faction' : 'Faction', 
-            'rarity' : 'Rareté',
-            'type' : 'Type',
-            'handCost' : 'Coût de main', 
-            'reserveCost' : 'Coût de réserve', 
-            'forestPower' : 'Fôret', 
-            'mountainPower' : 'Montagne', 
-            'waterPower' : 'Eau', 
-            'abilities_fr' : 'Capacité',
-            'supportAbility_fr' : 'Capacité de soutien',
-            'imagePath' : 'URL image', 
-            'inMyCollection' : 'En possession', 
-            'Kickstarter' : 'Dont KS', 
-            'to_give' : 'En excès', 
-            'to_get' : 'Manquantes',
-            'progress' : st.column_config.ProgressColumn(
-                "Complétion (%)",
-                help="Progression sur l'atteinte du maximum par deck pour cette carte",
-                format="%d",
-                min_value=0,
-                max_value=100
-            ),
-            'imagePath': st.column_config.ImageColumn(
-                "Image", 
-                help="Aperçut de la carte. Double cliquer pour agrandir.",
-                width = "small"
-                )
-            }
-    
-        event = st.dataframe(df_my_collection,
-        column_config=column_configuration,
-        use_container_width=True,
-        hide_index=True,
-        on_select="rerun",
-        selection_mode="multi-row",
-        )
+            df_my_collection = df[df['inMyCollection'] > 0]
 
-        left, middle, right = st.columns(3)
+            # df_my_collection["image"] = df_my_collection["URL image"].apply(lambda x: st.image(x, width=80))
+        
+            column_configuration = {'name_fr' : 'Nom', 
+                'collectorNumber' : 'Numéro',
+                'faction' : 'Faction', 
+                'rarity' : 'Rareté',
+                'type' : 'Type',
+                'handCost' : 'Coût de main', 
+                'reserveCost' : 'Coût de réserve', 
+                'forestPower' : 'Fôret', 
+                'mountainPower' : 'Montagne', 
+                'waterPower' : 'Eau', 
+                'abilities_fr' : 'Capacité',
+                'supportAbility_fr' : 'Capacité de soutien',
+                'inMyCollection' : 'En possession', 
+                'Kickstarter' : 'Dont KS', 
+                'to_give' : 'En excès', 
+                'to_get' : 'Manquantes',
+                'progress' : st.column_config.ProgressColumn(
+                    "Complétion (%)",
+                    help="Progression sur l'atteinte du maximum par deck pour cette carte",
+                    format="%d",
+                    min_value=0,
+                    max_value=100
+                ),
+                'imagePath': st.column_config.ImageColumn(
+                    "Image", 
+                    help="Aperçut de la carte. Double cliquer pour agrandir.",
+                    width = "small"
+                    )
+                }
+        
+            
+            tab1, tab2 = st.tabs(["Mes cartes", "Toutes les cartes"])
 
-        with left :
-            to_give = st.button("à donner")
+            with tab1: 
+                event = st.dataframe(df_my_collection,
+            column_config=column_configuration,
+            use_container_width=True,
+            hide_index=True,
+            on_select="rerun",
+            selection_mode="multi-row",
+            )
 
-        with middle :
-            to_get = st.button("à récupérer")
+            left, right = st.columns(2)
 
-        cards = event.selection.rows
-        filtered_df = df_my_collection.iloc[cards]
+            with left : 
+                st.header(f"Filtres : ")
+                to_give = st.button("à donner")
+                to_get = st.button("à récupérer")
 
-        st.header(f"Cartes sélectionnées : {len(cards)}")
+            with right :    
+                cards = event.selection.rows
+                filtered_df = df_my_collection[['imagePath','name_fr','faction','rarity','type','collectorNumber','to_give', 'to_get']].iloc[cards]
 
-        st.dataframe(
-        filtered_df,
-        column_config=column_configuration,
-        use_container_width=True,
-        )
+                st.header(f"Cartes sélectionnées : {len(cards)}")
 
+                st.dataframe(
+            filtered_df,
+            column_config=column_configuration,
+            use_container_width=True,
+            )
+
+            df_all_cards = df[df['inMyCollection'] <= 0]
+            df_all_cards = df_all_cards.drop(['inMyCollection', 'Kickstarter', 'to_give', 'to_get', 'progress', 'id'], axis=1)
+
+            column_configuration_2 = {'name_fr' : 'Nom', 
+                'collectorNumber' : 'Numéro',
+                'faction' : 'Faction', 
+                'rarity' : 'Rareté',
+                'type' : 'Type',
+                'handCost' : 'Coût de main', 
+                'reserveCost' : 'Coût de réserve', 
+                'forestPower' : 'Fôret', 
+                'mountainPower' : 'Montagne', 
+                'waterPower' : 'Eau', 
+                'abilities_fr' : 'Capacité',
+                'supportAbility_fr' : 'Capacité de soutien',
+                'imagePath': st.column_config.ImageColumn(
+                    "Image", 
+                    help="Aperçut de la carte. Double cliquer pour agrandir.",
+                    width = "small"
+                    )
+                }
+
+            with tab2 :
+                event = st.dataframe(df_all_cards,
+            column_config=column_configuration_2,
+            use_container_width=True,
+            hide_index=True,
+            on_select="rerun",
+            selection_mode="multi-row",
+            )
+
+        else :
+            st.error("La collection n'est pas créée. Merci d'ajouter votre token via la page 'Home'.")    
 
 ### TRADABLE PAGE ###     
     if selected == "Tradable" : 

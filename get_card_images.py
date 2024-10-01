@@ -7,9 +7,9 @@ FORCE_REDOWNLOAD = False
 DOWNLOAD_CARD_IMAGES = True
 DOWNLOAD_ASSETS = False
 USE_COLLECTOR_NUMBERS = False
-CARDS_DATA_PATH = "results/cards.json"
-CARD_IMAGES_FOLDER = "card_images"
-CARD_ASSETS_FOLDER = "card_assets"
+CARDS_DATA_PATH = "data/cards.json"
+CARD_IMAGES_FOLDER = "data/card_images"
+CARD_ASSETS_FOLDER = "data/card_assets"
 
 # Imports
 import os

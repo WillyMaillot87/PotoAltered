@@ -8,7 +8,7 @@ load_dotenv()
 
 # Parameters
 LANGUAGES = ["fr"]
-OUTPUT_FOLDER = "results"
+OUTPUT_FOLDER = "data"
 MY_TOKEN = os.getenv("TOKEN")
 
 if __name__ == "__main__":
