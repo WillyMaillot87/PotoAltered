@@ -1,6 +1,8 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
 import pandas as pd
+import os
+import subprocess
 
 
 st.set_page_config(
@@ -17,7 +19,12 @@ st.set_page_config(
 # passing the name in the sidebar as key and the imported tab
 # as value as follow :
 
-
+def run_script():
+    try :
+        subprocess.run(['bash', 'run_all.sh'])
+        st.success("La collection est téléchargée !")
+    except subprocess.CalledProcessError as e:
+        st.error(f"Erreur lors de l'execution du script : {e}")
 
 def run():
     # MENU 
@@ -29,7 +36,7 @@ def run():
         orientation="horizontal"
     )
 
-    df = pd.read_csv("src/data/global_vision.csv")
+    df = pd.read_csv("data/global_vision.csv")
 
     # new_names_fr = {'name_fr' : 'Nom', 
     #          'collectorNumber' : 'Numéro', 
@@ -78,9 +85,22 @@ Ne communiquez pas votre token à une autre personne, encore moins à Flopin !!!
             
             with mini_col2 :
                 submit = st.button("Charger la collection")
+
             if submit:
                 st.session_state["input_token"] = input_token
                 st.write("Téléchargement en cours... BLA BLA BLA ... BIP BIP BOOP BIP...01001110100111010101010")
+                # Écrire le token dans le fichier .env
+                with open('.env', 'w') as f:
+                    f.write(f"TOKEN={input_token}")
+
+            # Bouton pour enregistrer le token dans le fichier .env et pour lancer les scripts
+            if submit:
+                # Écrire le token dans le fichier .env
+                with open('.env', 'w') as f:
+                    f.write(f"TOKEN={input_token}")
+
+                # Executer les scripts
+                run_script()
 
         with col2 :
             st.image("PotoAltered.png", width=800)

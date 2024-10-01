@@ -6,9 +6,9 @@ import pandas as pd
 import numpy as np
 
 #PARAMETERS
-ALL_CARDS_PATH = "src/data/cards_fr.csv"
-MY_COLLECTION_PATH = "src/data/collection_fr.csv"
-CSV_OUTPUT_PATH = "src/data/global_vision.csv"
+ALL_CARDS_PATH = "data/cards_fr.csv"
+MY_COLLECTION_PATH = "data/collection_fr.csv"
+CSV_OUTPUT_PATH = "data/global_vision.csv"
 
 def check_KS(id):
     '''Identify the Kickstarter edition'''

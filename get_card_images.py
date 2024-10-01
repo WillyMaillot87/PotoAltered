@@ -13,7 +13,7 @@ CARD_ASSETS_FOLDER = "card_assets"
 
 # Imports
 import os
-from src.utils import create_folder_if_not_exists, download_file, load_json
+from utils import create_folder_if_not_exists, download_file, load_json
 
 def main():
     if not DOWNLOAD_CARD_IMAGES and not DOWNLOAD_ASSETS:
