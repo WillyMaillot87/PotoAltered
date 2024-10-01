@@ -34,10 +34,10 @@ def get_dataframes(all_cards_path, my_collection_path):
         return
     
     all_cards = pd.read_csv(all_cards_path)
-    print("shape matrix 'all cards' = ", all_cards.shape)
+    print("shape of dataframe 'all cards' : ", all_cards.shape)
 
     my_collection = pd.read_csv(my_collection_path)
-    print("shape matrix 'my collection' = ", my_collection.shape)
+    print("shape of dataframe 'my collection' : ", my_collection.shape)
 
     ## Pre-processing **all_cards** dataframe
     my_collection['Kickstarter'] = my_collection['id'].apply(check_KS)
@@ -98,46 +98,78 @@ def get_dataframes(all_cards_path, my_collection_path):
 
 
     ## Merging the two dataframes :
-    print("merging the dataframes...")
+    print("merging & cleaning the dataframes...")
 
     df = df_all_cards.merge(df_collec[['collectorNumber',
                                     'inMyCollection',
                                     'Kickstarter',
+                                    'max_card',
                                     'to_give',
                                     'to_get']], left_on='collectorNumber', right_on='collectorNumber', how='left')
 
+    df['progress'] = (df['inMyCollection'] / df['max_card']) * 100
 
-    new_names_fr = {'name_fr' : 'Nom', 
-             'collectorNumber' : 'Numéro de carte', 
-             'rarity' : 'Rareté',
-             'handCost' : 'Coût de main', 
-             'reserveCost' : 'Coût de réserve', 
-             'forestPower' : 'Fôret', 
-             'mountainPower' : 'Montagne', 
-             'waterPower' : 'Eau', 
-             'abilities_fr' : 'Capacité principale', 
-             'supportAbility_fr' : 'Capacité de soutien',
-             'imagePath' : 'URL image', 
-             'inMyCollection' : 'Nombre possédé', 
-             'Kickstarter' : 'Nombre de kickstarter possédé', 
-             'to_give' : 'Nombre de carte en excés', 
-             'to_get' : 'Nombre de cartes manquantes'
-    }
-
-    df = df.rename(columns = new_names_fr)
-
-    df = df[['Nom', 'faction', 'Rareté', 'type', 'Nombre possédé',
-       'Nombre de kickstarter possédé', 'Nombre de carte en excés',
-       'Nombre de cartes manquantes', 'Coût de main',
-       'Coût de réserve', 'Fôret', 'Montagne', 'Eau', 'Capacité principale',
-       'Capacité de soutien','Numéro de carte',  'id', 'URL image']]
-    
     df = df.fillna(0)
 
-    df[['Nombre possédé', 'Nombre de kickstarter possédé', 'Nombre de carte en excés', 'Nombre de cartes manquantes']] = df[['Nombre possédé', 'Nombre de kickstarter possédé', 'Nombre de carte en excés', 'Nombre de cartes manquantes']].astype('int')
+    def clean_int_values(list_columns):
+        '''Nettoyer les int qui ont le format '#1#' au lieu de '1' 
+            Puis remplacer les NaN en string par 0'''
+        for col in list_columns :
+            df[col] = df[col].str.extract(r'(\d+)')
+            df[col] = pd.to_numeric(df[col], errors='coerce').fillna(0)
+
+    list_cols_to_clean = ['handCost',
+                      'reserveCost',
+                      'forestPower',
+                      'mountainPower',
+                      'waterPower']
+
+    clean_int_values(list_cols_to_clean)
+
+    df[['forestPower',
+        'mountainPower', 
+        'waterPower', 
+        'inMyCollection', 
+        'Kickstarter', 
+        'max_card', 
+        'to_give', 
+        'to_get']] = df[['forestPower',
+        'mountainPower', 
+        'waterPower', 
+        'inMyCollection', 
+        'Kickstarter', 
+        'max_card', 
+        'to_give', 
+        'to_get']].astype('int')
+
+    # new_names_fr = {'name_fr' : 'Nom', 
+    #          'collectorNumber' : 'Numéro', 
+    #          'rarity' : 'Rareté',
+    #          'handCost' : 'Coût de main', 
+    #          'reserveCost' : 'Coût de réserve', 
+    #          'forestPower' : 'Fôret', 
+    #          'mountainPower' : 'Montagne', 
+    #          'waterPower' : 'Eau', 
+    #          'abilities_fr' : 'Capacité',
+    #          'supportAbility_fr' : 'Capacité de soutien',
+    #          'imagePath' : 'URL image', 
+    #          'inMyCollection' : 'En possession', 
+    #          'Kickstarter' : 'dont KS', 
+    #          'to_give' : 'En excès', 
+    #          'to_get' : 'Manquantes',
+    #          'progress' : 'Progression'
+    # }
+
+    # df = df.rename(columns = new_names_fr)
+
+    df = df[['imagePath', 'name_fr', 'faction', 'rarity', 'type', 'inMyCollection',
+       'Kickstarter', 'to_give',
+       'to_get','progress', 'handCost',
+       'reserveCost', 'forestPower', 'mountainPower', 'waterPower', 'abilities_fr',
+       'supportAbility_fr','collectorNumber', 'id']]
 
     df.to_csv(CSV_OUTPUT_PATH, index=False)
-    print(f"global_vision dataframe {df.shape} is ready ({CSV_OUTPUT_PATH})")
+    print(f"The dataframe 'global_vision'  {df.shape} is ready ({CSV_OUTPUT_PATH})")
 
 if __name__ == "__main__":
     get_dataframes(ALL_CARDS_PATH, MY_COLLECTION_PATH)

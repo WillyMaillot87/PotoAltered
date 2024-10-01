@@ -29,78 +29,135 @@ def run():
         orientation="horizontal"
     )
 
+    df = pd.read_csv("src/data/global_vision.csv")
+
+    # new_names_fr = {'name_fr' : 'Nom', 
+    #          'collectorNumber' : 'Numéro', 
+    #          'rarity' : 'Rareté',
+    #          'handCost' : 'Coût de main', 
+    #          'reserveCost' : 'Coût de réserve', 
+    #          'forestPower' : 'Fôret', 
+    #          'mountainPower' : 'Montagne', 
+    #          'waterPower' : 'Eau', 
+    #          'abilities_fr' : 'Capacité',
+    #          'supportAbility_fr' : 'Capacité de soutien',
+    #          'imagePath' : 'image', 
+    #          'inMyCollection' : 'En possession', 
+    #          'Kickstarter' : 'dont KS', 
+    #          'to_give' : 'En excès', 
+    #          'to_get' : 'Manquantes',
+    #          'progress' : 'Progression'
+    # }
+
+    # df = df.rename(columns = new_names_fr)
+
 ### HOME PAGE ###
     if selected == "Home" : 
-        st.image("PotoAltered.png", width=500)
+        
+        col1, col2 = st.columns(2)
 
-        with st.sidebar:
+        with col1 : 
+            st.title("Bienvenue !")
+            st.text("""Dans le but de pouvoir récupérer les données de votre collection personnelle,
+je vous invite à coller votre token JWT dans le champ ci-dessous. 
+Ce token est directement envoyé à l'API d'Altered pour vous identifier et accéder à votre collection.
+Le token n'est pas stocké dans l'application ni en local, ni en ligne.
+
+Cette étape n'est à faire qu'une seule fois pour télécharger les données de votre collection.
+                    
+Ne communiquez pas votre token à une autre personne, encore moins à Flopin !!!
+                    """)
+
+            mini_col1, mini_col2 = st.columns(2, vertical_alignment="bottom")
+
             if "input_token" not in st.session_state:
                 st.session_state["input_token"] = ""
-        
-            input_token = st.text_input("Coller le token ici pour charger la collection :", st.session_state["input_token"])
-            submit = st.button("Charger la collection")
+
+            with mini_col1 :
+                input_token = st.text_input("COLLER LE TOKEN ICI :", st.session_state["input_token"])
+            
+            with mini_col2 :
+                submit = st.button("Charger la collection")
             if submit:
                 st.session_state["input_token"] = input_token
                 st.write("Téléchargement en cours... BLA BLA BLA ... BIP BIP BOOP BIP...01001110100111010101010")
 
+        with col2 :
+            st.image("PotoAltered.png", width=800)
+
 
 ### COLLECTION PAGE ###
     if selected == "Collection" : 
-            st.header("Collection")
- 
-            st.write("J'ai plein de jolies cartes <3")
+        st.header("Collection")
 
-            df_my_collection = pd.read_csv("src/data/global_vision.csv")
+        st.write("J'ai plein de jolies cartes <3")
 
-        # st.image(
-        #         "https://s3-us-west-2.amazonaws.com/uw-s3-cdn/wp-content/uploads/sites/6/2017/11/04133712/waterfall.jpg",
-        #         width=400, # Manually Adjust the width of the image as per requirement
-        #     )
+        df_my_collection = df[df['inMyCollection'] > 0]
 
-        # df_my_collection[‘URL image’] = df.apply( lambda x: show_image_from_url(x[‘image_url’]), axis = 1 )
-
-            column_configuration = {
-            "name": st.column_config.TextColumn(
-                "Name", help="The name of the user", max_chars=100, width="medium"
+        # df_my_collection["image"] = df_my_collection["URL image"].apply(lambda x: st.image(x, width=80))
+    
+        column_configuration = {'name_fr' : 'Nom', 
+            'collectorNumber' : 'Numéro',
+            'faction' : 'Faction', 
+            'rarity' : 'Rareté',
+            'type' : 'Type',
+            'handCost' : 'Coût de main', 
+            'reserveCost' : 'Coût de réserve', 
+            'forestPower' : 'Fôret', 
+            'mountainPower' : 'Montagne', 
+            'waterPower' : 'Eau', 
+            'abilities_fr' : 'Capacité',
+            'supportAbility_fr' : 'Capacité de soutien',
+            'imagePath' : 'URL image', 
+            'inMyCollection' : 'En possession', 
+            'Kickstarter' : 'Dont KS', 
+            'to_give' : 'En excès', 
+            'to_get' : 'Manquantes',
+            'progress' : st.column_config.ProgressColumn(
+                "Complétion (%)",
+                help="Progression sur l'atteinte du maximum par deck pour cette carte",
+                format="%d",
+                min_value=0,
+                max_value=100
             ),
-            "activity": st.column_config.LineChartColumn(
-                "Activity (1 year)",
-                help="The user's activity over the last 1 year",
-                width="large",
-                y_min=0,
-                y_max=100,
-            ),
-            "daily_activity": st.column_config.BarChartColumn(
-                "Activity (daily)",
-                help="The user's activity in the last 25 days",
-                width="medium",
-                y_min=0,
-                y_max=1,
-            ),
+            'imagePath': st.column_config.ImageColumn(
+                "Image", 
+                help="Aperçut de la carte. Double cliquer pour agrandir.",
+                width = "small"
+                )
             }
+    
+        event = st.dataframe(df_my_collection,
+        column_config=column_configuration,
+        use_container_width=True,
+        hide_index=True,
+        on_select="rerun",
+        selection_mode="multi-row",
+        )
 
-            event = st.dataframe(df_my_collection,
-            column_config=column_configuration,
-            use_container_width=True,
-            hide_index=True,
-            on_select="rerun",
-            selection_mode="multi-row",
-            )
+        left, middle, right = st.columns(3)
 
-            st.header("Cartes sélectionnées")
-            cards = event.selection.rows
-            filtered_df = df_my_collection.iloc[cards]
+        with left :
+            to_give = st.button("à donner")
 
-            st.dataframe(
-            filtered_df,
-            column_config=column_configuration,
-            use_container_width=True,
-            )
+        with middle :
+            to_get = st.button("à récupérer")
+
+        cards = event.selection.rows
+        filtered_df = df_my_collection.iloc[cards]
+
+        st.header(f"Cartes sélectionnées : {len(cards)}")
+
+        st.dataframe(
+        filtered_df,
+        column_config=column_configuration,
+        use_container_width=True,
+        )
 
 
 ### TRADABLE PAGE ###     
     if selected == "Tradable" : 
-        st.header("Under construction :building_construction:")
+        st.header("En construction :building_construction:")
 
 
 
