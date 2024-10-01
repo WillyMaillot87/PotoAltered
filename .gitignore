@@ -162,12 +162,10 @@ cython_debug/
 #.idea/
 
 # Other
-results
+src\results
+src\data
 temp
 card_images
 card_assets
 .exploration.ipynb
-TODO.txt
-data\cards_fr.csv
-data\collection_fr.csv
 PotoAltered.code-workspace

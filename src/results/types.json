@@ -1,0 +1,20 @@
+{
+  "TOKEN": {
+    "fr": "Jeton Personnage"
+  },
+  "HERO": {
+    "fr": "Héros"
+  },
+  "CHARACTER": {
+    "fr": "Personnage"
+  },
+  "SPELL": {
+    "fr": "Sort"
+  },
+  "PERMANENT": {
+    "fr": "Permanent"
+  },
+  "TOKEN_MANA": {
+    "fr": "Mana"
+  }
+}
