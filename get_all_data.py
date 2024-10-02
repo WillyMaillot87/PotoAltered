@@ -108,7 +108,8 @@ def get_dataframes(all_cards_path, my_collection_path):
                                     'to_get']], left_on='collectorNumber', right_on='collectorNumber', how='left')
 
     df['progress'] = (df['inMyCollection'] / df['max_card']) * 100
-
+    df['progress'] = df['progress'].apply(lambda x: 100 if x > 100 else x)
+    
     df = df.fillna(0)
 
     def clean_int_values(list_columns):
@@ -142,6 +143,12 @@ def get_dataframes(all_cards_path, my_collection_path):
         'to_give', 
         'to_get']].astype('int')
 
+    df = df[['imagePath', 'name_fr', 'faction', 'rarity', 'type', 'inMyCollection',
+       'Kickstarter', 'to_give',
+       'to_get','progress', 'handCost',
+       'reserveCost', 'forestPower', 'mountainPower', 'waterPower', 'abilities_fr',
+       'supportAbility_fr','collectorNumber', 'id']]
+    
     # new_names_fr = {'name_fr' : 'Nom', 
     #          'collectorNumber' : 'Numéro', 
     #          'rarity' : 'Rareté',
@@ -152,7 +159,7 @@ def get_dataframes(all_cards_path, my_collection_path):
     #          'waterPower' : 'Eau', 
     #          'abilities_fr' : 'Capacité',
     #          'supportAbility_fr' : 'Capacité de soutien',
-    #          'imagePath' : 'URL image', 
+    #          'imagePath' : 'Image', 
     #          'inMyCollection' : 'En possession', 
     #          'Kickstarter' : 'dont KS', 
     #          'to_give' : 'En excès', 
@@ -161,12 +168,6 @@ def get_dataframes(all_cards_path, my_collection_path):
     # }
 
     # df = df.rename(columns = new_names_fr)
-
-    df = df[['imagePath', 'name_fr', 'faction', 'rarity', 'type', 'inMyCollection',
-       'Kickstarter', 'to_give',
-       'to_get','progress', 'handCost',
-       'reserveCost', 'forestPower', 'mountainPower', 'waterPower', 'abilities_fr',
-       'supportAbility_fr','collectorNumber', 'id']]
 
     df.to_csv(CSV_OUTPUT_PATH, index=False)
     print(f"The dataframe 'global_vision'  {df.shape} is ready ({CSV_OUTPUT_PATH})")

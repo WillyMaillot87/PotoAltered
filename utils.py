@@ -23,6 +23,14 @@ LANGUAGE_HEADERS = {
 import requests
 import os
 import json
+import pandas as pd
+import streamlit as st
+from pandas.api.types import (
+    is_categorical_dtype,
+    is_datetime64_any_dtype,
+    is_numeric_dtype,
+    is_object_dtype,
+)
 
 def create_folder_if_not_exists(folder):
     if not os.path.exists(folder):
@@ -52,3 +60,4 @@ def load_json(filename):
 def load_txt(filename):
     with open(filename, encoding="utf8") as f:
         return f.read()
+

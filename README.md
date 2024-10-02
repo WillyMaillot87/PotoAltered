@@ -9,3 +9,19 @@ This app offers a comprehensive solution for tracking your **Altered** collectio
 - Missing Cards: Identify which cards you need to complete your collection.
 - Excess Cards: Determine cards you have in excess and consider trading or selling.
 
+## How to use
+
+**Clone the repository**
+
+`git clone https://github.com/WiXXX7/PotoAltered`
+
+
+**Run the docker app**
+
+`docker run -p 8501:8501 -v /home/user/data:/data potoaltered`
+
+
+**Use the app** 
+
+* Connect to http://localhost:8501/ on your browser.
+* **First time users:** You'll need to obtain a token to download your c
