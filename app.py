@@ -3,7 +3,6 @@ from streamlit_option_menu import option_menu
 import pandas as pd
 import os
 import subprocess
-from utils import filter_dataframe
 
 
 st.set_page_config(
@@ -70,7 +69,7 @@ Ne communiquez votre token à personne !
                 st.write("Téléchargement en cours... BLA BLA BLA ... BIP BIP BOOP BIP...01001110100111010101010")
                 # Écrire le token dans le fichier .env
                 with open('.env', 'w') as f:
-                    f.write(f"TOKEN={input_token}")
+                    f.write(f"TOKEN='{input_token}'")
 
             # Bouton pour enregistrer le token dans le fichier .env et pour lancer les scripts
             if submit:
