@@ -13,12 +13,12 @@ This app offers a comprehensive solution for tracking your **Altered** collectio
 
 **Clone the repository**
 
-`git clone https://github.com/WiXXX7/PotoAltered`
+`git clone https://github.com/WillyMaillot87/PotoAltered`
 
 
 **Run the docker app**
 
-`docker run -p 8501:8501 -v /home/user/data:/data potoaltered`
+`docker run -p 8501:8501 potoaltered`
 
 
 **Use the app** 

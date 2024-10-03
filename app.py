@@ -43,14 +43,14 @@ def run():
 
         with col1 : 
             st.title("Bienvenue !")
-            st.text("""Dans le but de pouvoir récupérer les données de votre collection personnelle,
-je vous invite à coller votre token JWT dans le champ ci-dessous. 
-Ce token est directement envoyé à l'API d'Altered pour vous identifier et accéder à votre collection.
-Le token n'est pas stocké dans l'application ni en local, ni en ligne.
+            st.text("""Dans le but de pouvoir récupérer les données de ta collection personnelle,
+je t'invite à coller ton token JWT dans le champ ci-dessous. 
+Ce token est directement envoyé à l'API d'Altered pour t'identifier et accéder à ta collection.
+Le token n'est pas envoyé en ligne, il reste stocké uniquement sur ton application à toi.
 
-Cette étape n'est à faire qu'une seule fois pour télécharger les données de votre collection.
+Cette étape n'est à faire qu'une seule fois pour télécharger les données de ta collection.
                     
-Ne communiquez votre token à personne !
+Ne communiques ton token à personne !
                     """)
 
             mini_col1, mini_col2 = st.columns(2, vertical_alignment="bottom")
