@@ -7,6 +7,7 @@ FROM python:3.11-slim-bullseye
 WORKDIR /app
 
 RUN mkdir /app/data
+RUN touch /app/token.txt
 
 VOLUME /app/data
 
@@ -28,7 +29,6 @@ RUN apt-get update && apt-get install -y
 RUN pip install --upgrade pip 
 RUN pip install -r requirements.txt
 
-ENV TOKEN = ""
 
 # Exposer le port que streamlit utilisera
 EXPOSE 8501

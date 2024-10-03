@@ -60,4 +60,3 @@ def load_json(filename):
 def load_txt(filename):
     with open(filename, encoding="utf8") as f:
         return f.read()
-
