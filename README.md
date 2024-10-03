@@ -11,17 +11,17 @@ This app offers a comprehensive solution for tracking your **Altered** collectio
 
 ## How to use
 
-**Clone the repository**
+**Pull the docker image**
 
-`git clone https://github.com/WillyMaillot87/PotoAltered`
+`docker pull willymaillot87/potoaltered:v1.0`
 
 
 **Run the docker app**
 
-`docker run -p 8501:8501 potoaltered`
+`docker run -p 8501:8501 willymaillot87/potoaltered:v1.0`
 
 
 **Use the app** 
 
 * Connect to http://localhost:8501/ on your browser.
-* **First time users:** You'll need to obtain a token to download your c
+* **First time users:** You'll need to obtain a token to download your collection.
