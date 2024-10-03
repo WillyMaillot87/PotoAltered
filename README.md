@@ -11,9 +11,9 @@ This app offers a comprehensive solution for tracking your **Altered** collectio
 
 ## How to use
 
-**Clone the repository**
+**Pull the docker image**
 
-`git clone https://github.com/WillyMaillot87/PotoAltered`
+`docker pull willymaillot87/potoaltered:v1.0`
 
 
 **Run the docker app**
