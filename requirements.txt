@@ -1,6 +1,4 @@
 requests
 pandas
-python-dotenv
 streamlit
 streamlit-option-menu
-plotly
