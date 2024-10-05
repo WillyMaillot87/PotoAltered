@@ -22,12 +22,12 @@ st.set_page_config(
 def run_script():
     try :
         subprocess.run(['bash', 'run_all.sh'])
-        st.success("La collection est téléchargée !")
+        st.success("Le chargement de la collection est terminé.")
     except subprocess.CalledProcessError as e:
         st.error(f"Erreur lors de l'execution du script : {e}")
 
 def run():
-    # MENU 
+### MENU ###
     selected = option_menu(
         menu_title=None,
         options=["Home", "Collection", "Tradable"],
@@ -43,11 +43,9 @@ def run():
 
         with col1 : 
             st.title("Bienvenue !")
-            st.text("""Dans le but de pouvoir récupérer les données de ta collection personnelle,
-je t'invite à coller ton token JWT dans le champ ci-dessous. 
+            st.markdown("""Dans le but de pouvoir récupérer les données de ta collection personnelle, je t'invite à coller ton token JWT dans le champ ci-dessous. 
 Ce token est directement envoyé à l'API d'Altered pour t'identifier et accéder à ta collection.
 Le token n'est pas envoyé en ligne, il reste stocké uniquement sur ton application à toi.
-
 Cette étape n'est à faire qu'une seule fois pour télécharger les données de ta collection.
                     
 Ne communiques ton token à personne !
@@ -94,6 +92,8 @@ Ne communiques ton token à personne !
         if os.path.isfile("data/global_vision.csv") :
             df = pd.read_csv("data/global_vision.csv")    
 
+            df['Forest-Mountain-Water'] = df[['forestPower', 'mountainPower', 'waterPower']].apply(lambda x: list(x), axis=1)
+
             new_names_fr = {'name_fr' : 'Nom',
                             'faction' : 'Faction', 
                             'collectorNumber' : 'Numéro',
@@ -101,6 +101,7 @@ Ne communiques ton token à personne !
                             'rarity' : 'Rareté',
                             'handCost' : 'Coût de main', 
                             'reserveCost' : 'Coût de réserve', 
+                            'Forest-Mountain-Water' : 'Forêt-Montagne-Eau',
                             'forestPower' : 'Fôret', 
                             'mountainPower' : 'Montagne', 
                             'waterPower' : 'Eau', 
@@ -116,6 +117,29 @@ Ne communiques ton token à personne !
 
             df = df.rename(columns = new_names_fr)
 
+            column_order = ('Image',
+                            'Nom',
+                            'Faction',
+                            'Type', 
+                            'Rareté',
+                            'En possession',
+                            'Dont KS',
+                            'En excès', 
+                            'Manquantes',
+                            'Complétion',
+                            'Coût de main', 
+                            'Coût de réserve', 
+                            'Forêt-Montagne-Eau',
+                            # 'Fôret', 
+                            # 'Montagne', 
+                            # 'Eau', 
+                            'Capacité',
+                            'Capacité de soutien',
+                            'Numéro'
+                            )
+
+            # df_my_collec = df[(df['Rareté'] != 'Neutre') & (df['En possession'] > 0)]
+            # st.bar_chart(df_my_collec, x="Rareté", y="En possession", color="Faction", stack=False)
 
             column_configuration = {
                 'Complétion' : st.column_config.ProgressColumn(
@@ -129,7 +153,7 @@ Ne communiques ton token à personne !
                     "Image", 
                     help="Aperçut de la carte. Double cliquer pour agrandir.",
                     width = "small"
-                    )
+                    ),
                 }
         
             filter_col, df_col = st.columns([1, 4])
@@ -242,6 +266,7 @@ Ne communiques ton token à personne !
                 st.header("Collection")
                 event = st.dataframe(df,
                 column_config=column_configuration,
+                column_order=column_order,
                 use_container_width=True,
                 hide_index=True,
                 # on_select="rerun",
