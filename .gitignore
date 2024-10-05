@@ -163,7 +163,7 @@ cython_debug/
 
 #stlite
 node_modules
-package.json
+package-lock.json
 
 # Other
 data
