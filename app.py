@@ -83,7 +83,7 @@ Ne communiques ton token à personne !
                 run_script()
 
         with col2 :
-            st.image("PotoAltered.png", width=800)
+            st.image("images/PotoAltered.png", width=800)
 
 
 ### COLLECTION PAGE ###
