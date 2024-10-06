@@ -5,12 +5,12 @@ MAIN_LANGUAGE = "fr"
 GROUP_SUBTYPES = False
 INCLUDE_WEB_ASSETS = False
 
-CARDS_DATA_PATH = "data/collection.json"
+COLLECTION_DATA_PATH = "data/collection.json"
 FACTIONS_DATA_PATH = "data/factions.json"
 TYPES_DATA_PATH = "data/types.json"
 SUBTYPES_DATA_PATH = "data/subtypes.json"
 RARITIES_DATA_PATH = "data/rarities.json"
-CSV_OUTPUT_PATH = "data/collection_" + MAIN_LANGUAGE + ".csv"
+CSV_COLLEC_OUTPUT_PATH = "data/collection_" + MAIN_LANGUAGE + ".csv"
 
 # Imports
 import os
@@ -18,9 +18,9 @@ import csv
 import itertools
 from utils import load_json
 
-def main():
-    if not os.path.exists(CARDS_DATA_PATH):
-        print(f"File {CARDS_DATA_PATH} not found. Have you run get_cards_data.py?")
+def get_csv_collec():
+    if not os.path.exists(COLLECTION_DATA_PATH):
+        print(f"File {COLLECTION_DATA_PATH} not found. Have you run get_cards_data.py?")
         return
     if not os.path.exists(FACTIONS_DATA_PATH):
         print(f"File {FACTIONS_DATA_PATH} not found. Have you run get_cards_data.py?")
@@ -35,7 +35,7 @@ def main():
         print(f"File {RARITIES_DATA_PATH} not found. Have you run get_cards_data.py?")
         return
     
-    data = load_json(CARDS_DATA_PATH)
+    data = load_json(COLLECTION_DATA_PATH)
     factions = load_json(FACTIONS_DATA_PATH)
     types = load_json(TYPES_DATA_PATH)
     subtypes = load_json(SUBTYPES_DATA_PATH)
@@ -136,7 +136,7 @@ def main():
     if INCLUDE_WEB_ASSETS:
         fieldnames += ["webAsset0", "webAsset1", "webAsset2"]
     
-    with open(CSV_OUTPUT_PATH, 'w', newline='', encoding="utf8") as csvfile:
+    with open(CSV_COLLEC_OUTPUT_PATH, 'w', newline='', encoding="utf8") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for card_dict in sorted(cards_dicts, key=custom_sort):
@@ -169,4 +169,4 @@ def get_subtypes_cols(data):
     return subtypes_cols
 
 if __name__ == "__main__":
-    main()
+    get_csv_collec()

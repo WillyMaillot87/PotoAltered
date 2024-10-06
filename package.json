@@ -13,10 +13,13 @@
       "files": ["build/**/*"],
       "directories": {
         "buildResources": "assets"
+      },
+      "win": {
+        "target": "portable"
       }
     },
     "devDependencies": {
-      "@stlite/desktop": "^0.63.1",
+      "@stlite/desktop": "^0.68.0",
       "cross-env": "^7.0.3",
       "electron": "30.0.8",
       "electron-builder": "^24.13.3"
@@ -31,12 +34,9 @@
                 "get_collection_data.py", 
                 "get_csv_collection.py", 
                 "get_csv_data.py",
-                "utils.py",
-                "run_all.sh"],
+                "utils.py"],
         "entrypoint": "app.py",
-        "requirementsTxtFiles": ["requirements.txt"],
-        "embed": true,
-        "idbfsMountpoints": ["/mnt"]
+        "requirementsTxtFiles": ["requirements.txt"]
       }
     }
   }

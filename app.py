@@ -1,9 +1,50 @@
 import streamlit as st
-from streamlit_option_menu import option_menu
 import pandas as pd
 import os
 import subprocess
 
+
+from streamlit_option_menu import option_menu
+from get_cards_data import get_cards_data
+from get_csv_data import get_csv
+from get_csv_collection import get_csv_collec
+from get_all_data import get_dataframes
+from utils import dump_json, create_folder_if_not_exists, LANGUAGE_HEADERS
+from os.path import join
+
+# Parameters
+LANGUAGES = ["fr"]
+DUMP_TEMP_FILES = False
+OUTPUT_FOLDER = "data"
+TEMP_FOLDER = "temp"
+INCLUDE_PROMO_CARDS = False
+INCLUDE_UNIQUES = False
+INCLUDE_KS = True
+FORCE_INCLUDE_KS_UNIQUES = False # only relevant if INCLUDE_KS = False and INCLUDE_UNIQUES = True
+INCLUDE_FOILERS = False
+SKIP_NOT_ALL_LANGUAGES = False
+COLLECTION_TOKEN=None
+
+NAME_LANGUAGES = ["fr"]
+ABILITIES_LANGUAGES = ["fr"]
+MAIN_LANGUAGE = "fr"
+GROUP_SUBTYPES = False
+INCLUDE_WEB_ASSETS = False
+
+CARDS_DATA_PATH = "data/cards.json"
+COLLECTION_DATA_PATH = "data/collection.json"
+FACTIONS_DATA_PATH = "data/factions.json"
+TYPES_DATA_PATH = "data/types.json"
+SUBTYPES_DATA_PATH = "data/subtypes.json"
+RARITIES_DATA_PATH = "data/rarities.json"
+CSV_OUTPUT_PATH = "data/cards_" + MAIN_LANGUAGE + ".csv"
+CSV_COLLEC_OUTPUT_PATH = "data/collection_" + MAIN_LANGUAGE + ".csv"
+ALL_CARDS_PATH = "data/cards_fr.csv"
+MY_COLLECTION_PATH = "data/collection_fr.csv"
+CSV_ALL_OUTPUT_PATH = "data/global_vision.csv"
+
+with open("token.txt", "r") as f:
+    saved_token = f.read()
 
 st.set_page_config(
     page_title= "PotoAltered",
@@ -15,13 +56,31 @@ st.set_page_config(
         'About': "# PotoAltered. \n Une app très cool faite par Willy Maillot"}
         )
 
-# add new and/or renamed tab in this ordered dict by
-# passing the name in the sidebar as key and the imported tab
-# as value as follow :
-
 def run_script():
     try :
-        subprocess.run(['bash', 'run_all.sh'])
+        #get_cards_data :
+        cards, types, subtypes, factions, rarities = get_cards_data()
+        create_folder_if_not_exists(OUTPUT_FOLDER)
+        dump_json(cards,    join(OUTPUT_FOLDER, 'cards.json'))
+        dump_json(types,    join(OUTPUT_FOLDER, 'types.json'))
+        dump_json(subtypes, join(OUTPUT_FOLDER, 'subtypes.json'))
+        dump_json(factions, join(OUTPUT_FOLDER, 'factions.json'))
+        dump_json(rarities, join(OUTPUT_FOLDER, 'rarities.json'))
+
+        #get_collection_data :
+        collection, types, subtypes, factions, rarities = get_cards_data(collection_token=saved_token)
+        create_folder_if_not_exists(OUTPUT_FOLDER)
+        dump_json(collection,    join(OUTPUT_FOLDER, 'collection.json'))
+
+        #get_csv_data :
+        get_csv()
+
+        #get_csv_collection :
+        get_csv_collec()
+
+        #get_all_data
+        get_dataframes(ALL_CARDS_PATH, MY_COLLECTION_PATH)
+
         st.success("Le chargement de la collection est terminé.")
     except subprocess.CalledProcessError as e:
         st.error(f"Erreur lors de l'execution du script : {e}")
@@ -72,6 +131,8 @@ Ne communiques ton token à personne !
                     f.write(input_token)
                 st.write("Token sauvegardé")
 
+                with open("token.txt", "r") as f:
+                    saved_token = f.read()
             # # Bouton pour enregistrer le token dans le fichier .env et pour lancer les scripts
             # if submit:
             #     # Écrire le token dans le fichier .env
@@ -155,7 +216,21 @@ Ne communiques ton token à personne !
                     width = "small"
                     ),
                 }
-        
+            stats1, stats2, stats3= st.columns([1, 1, 2])
+            
+            shape_all = df.shape[0]
+            shape_collec = df[df['En possession'] > 0].shape[0]
+
+            with stats1 :
+                st.markdown(f"**{shape_all}** cartes à collectionner")
+            
+            with stats2 :
+                st.markdown(f"**{shape_collec}** cartes dans la collection")
+
+            with stats3 :
+                st.markdown(f"Collection complétée à **{(shape_collec / shape_all) * 100:.2f}** %")
+
+
             filter_col, df_col = st.columns([1, 4])
             
             with filter_col :
