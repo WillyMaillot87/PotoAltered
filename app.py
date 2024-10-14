@@ -2,14 +2,14 @@ import streamlit as st
 import pandas as pd
 import os
 import subprocess
-
+import plotly.express as px
 
 from streamlit_option_menu import option_menu
 from get_cards_data import get_cards_data
 from get_csv_data import get_csv
 from get_csv_collection import get_csv_collec
 from get_all_data import get_dataframes
-from utils import dump_json, create_folder_if_not_exists, LANGUAGE_HEADERS
+from utils import dump_json, create_folder_if_not_exists
 from os.path import join
 
 # Parameters
@@ -20,7 +20,7 @@ TEMP_FOLDER = "temp"
 INCLUDE_PROMO_CARDS = False
 INCLUDE_UNIQUES = False
 INCLUDE_KS = True
-FORCE_INCLUDE_KS_UNIQUES = False # only relevant if INCLUDE_KS = False and INCLUDE_UNIQUES = True
+FORCE_INCLUDE_KS_UNIQUES = False 
 INCLUDE_FOILERS = False
 SKIP_NOT_ALL_LANGUAGES = False
 COLLECTION_TOKEN=None
@@ -56,7 +56,7 @@ st.set_page_config(
         'About': "# PotoAltered. \n Une app très cool faite par Willy Maillot"}
         )
 
-def run_script():
+def run_script(saved_token):
     try :
         #get_cards_data :
         cards, types, subtypes, factions, rarities = get_cards_data()
@@ -141,7 +141,7 @@ Ne communiques ton token à personne !
             #     st.write("Token sauvegardé !")
 
                 # Executer les scripts
-                run_script()
+                run_script(saved_token)
 
         with col2 :
             st.image("images/PotoAltered.png", width=800)
@@ -216,19 +216,44 @@ Ne communiques ton token à personne !
                     width = "small"
                     ),
                 }
-            stats1, stats2, stats3= st.columns([1, 1, 2])
+            stats, stats1, graph = st.columns([1, 1, 2], vertical_alignment="center")
             
             shape_all = df.shape[0]
             shape_collec = df[df['En possession'] > 0].shape[0]
 
             with stats1 :
                 st.markdown(f"**{shape_all}** cartes à collectionner")
-            
-            with stats2 :
                 st.markdown(f"**{shape_collec}** cartes dans la collection")
-
-            with stats3 :
                 st.markdown(f"Collection complétée à **{(shape_collec / shape_all) * 100:.2f}** %")
+
+            # Barplot :
+            df_barplot = df[['Type','Rareté','En possession', 'En excès', 'Manquantes']]
+            df_barplot['Max Deck'] = (df['En possession'] + df['Manquantes']) - df['En excès']
+
+            df_barplot['Progression'] = (df_barplot['En possession'] - df_barplot['En excès']) / df_barplot['Max Deck']
+            df_barplot = df_barplot.groupby(['Rareté', 'Type'])['Progression'].mean().reset_index()
+            df_barplot = df_barplot.query("Type in ['Héros', 'Personnage', 'Sort', 'Permanent']")
+
+            fig = px.bar(df_barplot, 
+                        x='Progression', 
+                        y='Rareté', 
+                        color='Type', 
+                        barmode='group',
+                        text=df_barplot['Progression'].apply(lambda x: f"{x:.2%}")          
+                        )
+
+            fig.update_layout(barcornerradius=15,
+                            #   showlegend=False,
+                              xaxis_title=None,
+                              yaxis_title=None,
+                              height=350,
+                              legend=dict(
+                                y=1.2, x=0.8  # Ajustez la valeur pour positionner la légende plus haut ou plus bas
+                            ))
+
+
+            with graph :
+                st.plotly_chart(fig, use_container_width=True, theme="streamlit")
 
 
             filter_col, df_col = st.columns([1, 4])

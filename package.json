@@ -34,7 +34,8 @@
                 "get_collection_data.py", 
                 "get_csv_collection.py", 
                 "get_csv_data.py",
-                "utils.py"],
+                "utils.py",
+                "token.txt"],
         "entrypoint": "app.py",
         "requirementsTxtFiles": ["requirements.txt"]
       }
