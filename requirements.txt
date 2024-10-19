@@ -1,4 +1,5 @@
-requests
-pandas
-streamlit
-streamlit-option-menu
+requests==2.31.0
+pandas==2.2.0
+plotly==5.24.1
+streamlit==1.38.0
+streamlit-option-menu==0.3.13
