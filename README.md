@@ -24,5 +24,4 @@ This app offers a comprehensive solution for tracking your **Altered** collectio
 **Use the app** 
 
 * Connect to http://localhost:8501/ on your browser.
-<<<<<<< HEAD
 * **First time users:** You'll need to obtain a token to download your collection.
