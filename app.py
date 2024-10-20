@@ -216,45 +216,6 @@ Ne communiques ton token à personne !
                     width = "small"
                     ),
                 }
-            stats, stats1, graph = st.columns([1, 1, 2], vertical_alignment="center")
-            
-            shape_all = df.shape[0]
-            shape_collec = df[df['En possession'] > 0].shape[0]
-
-            with stats1 :
-                st.markdown(f"**{shape_all}** cartes à collectionner")
-                st.markdown(f"**{shape_collec}** cartes dans la collection")
-                st.markdown(f"Collection complétée à **{(shape_collec / shape_all) * 100:.2f}** %")
-
-            # Barplot :
-            df_barplot = df[['Type','Rareté','En possession', 'En excès', 'Manquantes']]
-            df_barplot['Max Deck'] = (df['En possession'] + df['Manquantes']) - df['En excès']
-
-            df_barplot['Progression'] = (df_barplot['En possession'] - df_barplot['En excès']) / df_barplot['Max Deck']
-            df_barplot = df_barplot.groupby(['Rareté', 'Type'])['Progression'].mean().reset_index()
-            df_barplot = df_barplot.query("Type in ['Héros', 'Personnage', 'Sort', 'Permanent']")
-
-            fig = px.bar(df_barplot, 
-                        x='Progression', 
-                        y='Rareté', 
-                        color='Type', 
-                        barmode='group',
-                        text=df_barplot['Progression'].apply(lambda x: f"{x:.2%}")          
-                        )
-
-            fig.update_layout(barcornerradius=15,
-                            #   showlegend=False,
-                              xaxis_title=None,
-                              yaxis_title=None,
-                              height=350,
-                              legend=dict(
-                                y=1.2, x=0.8  # Ajustez la valeur pour positionner la légende plus haut ou plus bas
-                            ))
-
-
-            with graph :
-                st.plotly_chart(fig, use_container_width=True, theme="streamlit")
-
 
             filter_col, df_col = st.columns([1, 4])
             
@@ -380,9 +341,45 @@ Ne communiques ton token à personne !
             # st.dataframe(second_df, column_config=column_configuration, use_container_width=True)
         
 
+            st.header("Statistiques : ")
+            stats, graph = st.columns([1, 2], vertical_alignment="center")
+            
+            shape_all = df.shape[0]
+            shape_collec = df[df['En possession'] > 0].shape[0]
+
+            with stats :
+                st.markdown(f"**{shape_all}** cartes à collectionner")
+                st.markdown(f"**{shape_collec}** cartes dans la collection")
+                st.markdown(f"Collection complétée à **{(shape_collec / shape_all) * 100:.2f}** %")
+
+            # Barplot :
+            df_barplot = df[['Type','Rareté','En possession', 'En excès', 'Manquantes']]
+            df_barplot['Max Deck'] = (df['En possession'] + df['Manquantes']) - df['En excès']
+
+            df_barplot['Progression'] = (df_barplot['En possession'] - df_barplot['En excès']) / df_barplot['Max Deck']
+            df_barplot = df_barplot.groupby(['Rareté', 'Type'])['Progression'].mean().reset_index()
+            df_barplot = df_barplot.query("Type in ['Héros', 'Personnage', 'Sort', 'Permanent']")
+
+            fig = px.bar(df_barplot, 
+                        x='Progression', 
+                        y='Rareté', 
+                        color='Type', 
+                        barmode='group',
+                        text=df_barplot['Progression'].apply(lambda x: f"{x:.2%}")          
+                        )
+
+            fig.update_layout(barcornerradius=15,
+                            #   showlegend=False,
+                              xaxis_title=None,
+                              yaxis_title=None,
+                              height=350,
+                              legend=dict(
+                                y=0.5, x=-0.2  # Ajustez la valeur pour positionner la légende plus haut ou plus bas
+                            ))
 
 
-
+            with graph :
+                st.plotly_chart(fig, use_container_width=True, theme="streamlit")
 
         else :
             st.error("La collection n'est pas créée. Merci d'ajouter votre token via la page 'Home'.")    
