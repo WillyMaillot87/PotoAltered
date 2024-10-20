@@ -26,6 +26,72 @@ def run_script():
     except subprocess.CalledProcessError as e:
         st.error(f"Erreur lors de l'execution du script : {e}")
 
+def create_dataframe():
+    df = pd.read_csv("data/global_vision.csv")    
+
+    df['Forest-Mountain-Water'] = df[['forestPower', 'mountainPower', 'waterPower']].apply(lambda x: list(x), axis=1)
+
+    new_names_fr = {'name_fr' : 'Nom',
+                    'faction' : 'Faction', 
+                    'collectorNumber' : 'Numéro',
+                    'type' : 'Type', 
+                    'rarity' : 'Rareté',
+                    'handCost' : 'Coût de main', 
+                    'reserveCost' : 'Coût de réserve', 
+                    'Forest-Mountain-Water' : 'Forêt-Montagne-Eau',
+                    'forestPower' : 'Fôret', 
+                    'mountainPower' : 'Montagne', 
+                    'waterPower' : 'Eau', 
+                    'abilities_fr' : 'Capacité',
+                    'supportAbility_fr' : 'Capacité de soutien',
+                    'imagePath' : 'Image', 
+                    'inMyCollection' : 'En possession', 
+                    'Kickstarter' : 'Dont KS', 
+                    'to_give' : 'En excès', 
+                    'to_get' : 'Manquantes',
+                    'progress' : 'Complétion'
+                    }
+
+    df = df.rename(columns = new_names_fr)
+
+    column_order = ('Image',
+                    'Nom',
+                    'Faction',
+                    'Type', 
+                    'Rareté',
+                    'En possession',
+                    'Dont KS',
+                    'En excès', 
+                    'Manquantes',
+                    'Complétion',
+                    'Coût de main', 
+                    'Coût de réserve', 
+                    'Forêt-Montagne-Eau',
+                    # 'Fôret', 
+                    # 'Montagne', 
+                    # 'Eau', 
+                    'Capacité',
+                    'Capacité de soutien',
+                    'Numéro'
+                    )
+
+    column_configuration = {
+        'Complétion' : st.column_config.ProgressColumn(
+            "Complétion",
+            help="Progression sur l'atteinte du maximum par deck pour cette carte",
+            format="%d%%",
+            min_value=0,
+            max_value=100
+        ),
+        'Image': st.column_config.ImageColumn(
+            "Image", 
+            help="Aperçut de la carte. Double cliquer pour agrandir.",
+            width = "small"
+            ),
+        }
+    
+    return df, column_configuration, column_order
+
 def run():
 ### MENU ###
     selected = option_menu(
@@ -35,6 +101,7 @@ def run():
         # menu_icon=None,
         orientation="horizontal"
     )
+
 
 ### HOME PAGE ###
     if selected == "Home" : 
@@ -90,71 +157,7 @@ Ne communiques ton token à personne !
     if selected == "Collection" : 
 
         if os.path.isfile("data/global_vision.csv") :
-            df = pd.read_csv("data/global_vision.csv")    
-
-            df['Forest-Mountain-Water'] = df[['forestPower', 'mountainPower', 'waterPower']].apply(lambda x: list(x), axis=1)
-
-            new_names_fr = {'name_fr' : 'Nom',
-                            'faction' : 'Faction', 
-                            'collectorNumber' : 'Numéro',
-                            'type' : 'Type', 
-                            'rarity' : 'Rareté',
-                            'handCost' : 'Coût de main', 
-                            'reserveCost' : 'Coût de réserve', 
-                            'Forest-Mountain-Water' : 'Forêt-Montagne-Eau',
-                            'forestPower' : 'Fôret', 
-                            'mountainPower' : 'Montagne', 
-                            'waterPower' : 'Eau', 
-                            'abilities_fr' : 'Capacité',
-                            'supportAbility_fr' : 'Capacité de soutien',
-                            'imagePath' : 'Image', 
-                            'inMyCollection' : 'En possession', 
-                            'Kickstarter' : 'Dont KS', 
-                            'to_give' : 'En excès', 
-                            'to_get' : 'Manquantes',
-                            'progress' : 'Complétion'
-                            }
-
-            df = df.rename(columns = new_names_fr)
-
-            column_order = ('Image',
-                            'Nom',
-                            'Faction',
-                            'Type', 
-                            'Rareté',
-                            'En possession',
-                            'Dont KS',
-                            'En excès', 
-                            'Manquantes',
-                            'Complétion',
-                            'Coût de main', 
-                            'Coût de réserve', 
-                            'Forêt-Montagne-Eau',
-                            # 'Fôret', 
-                            # 'Montagne', 
-                            # 'Eau', 
-                            'Capacité',
-                            'Capacité de soutien',
-                            'Numéro'
-                            )
-
-            # df_my_collec = df[(df['Rareté'] != 'Neutre') & (df['En possession'] > 0)]
-            # st.bar_chart(df_my_collec, x="Rareté", y="En possession", color="Faction", stack=False)
-
-            column_configuration = {
-                'Complétion' : st.column_config.ProgressColumn(
-                    "Complétion",
-                    help="Progression sur l'atteinte du maximum par deck pour cette carte",
-                    format="%d%%",
-                    min_value=0,
-                    max_value=100
-                ),
-                'Image': st.column_config.ImageColumn(
-                    "Image", 
-                    help="Aperçut de la carte. Double cliquer pour agrandir.",
-                    width = "small"
-                    ),
-                }
+            df, column_configuration, column_order = create_dataframe()
         
             filter_col, df_col = st.columns([1, 4])
             
@@ -253,7 +256,7 @@ Ne communiques ton token à personne !
                 csv = convert_df(df)
 
                 st.download_button(
-                    "Press to Download",
+                    "Télécharger ce tableau",
                     csv,
                     "cartes_altered.csv",
                     "text/csv",
@@ -264,7 +267,7 @@ Ne communiques ton token à personne !
 
             with df_col :
                 st.header("Collection")
-                event = st.dataframe(df,
+                st.dataframe(df,
                 column_config=column_configuration,
                 column_order=column_order,
                 use_container_width=True,
@@ -289,8 +292,38 @@ Ne communiques ton token à personne !
 
 ### TRADABLE PAGE ###     
     if selected == "Tradable" : 
-        st.header("En construction :building_construction:")
+        
+        if os.path.isfile("data/global_vision.csv") :
+            df, column_configuration, column_order = create_dataframe()
 
+            col_owner, col_friend = st.columns([1,1])
+
+            df_owner = df.drop(columns=['Dont KS', 'Coût de main', 'Coût de réserve', 'Forêt-Montagne-Eau', 'Capacité', 'Capacité de soutien'])
+            df_owner = df_owner[df_owner['En possession'] > 0]
+
+            with col_owner :
+                st.header("Mes cartes :")
+                st.dataframe(df_owner,
+                        column_config=column_configuration,
+                        column_order=column_order,
+                        use_container_width=True,
+                        hide_index=True,
+                        on_select="rerun",
+                        selection_mode="multi-row",
+                        )
+            
+            with col_friend : 
+                st.header("Les cartes de mon poto :")
+                uploaded_file = st.file_uploader("")
+                #if uploaded_file is not None:
+                    #check si c'est un csv au bon format, gérer l'erreur
+                    #Si c'est ok, pd.read_csv sur le fichier uploadé
+                    #Afficher le df de l'ami sur la colonne col_friend.
+                    #gérer les cartes en commun.
+
+        
+        else :
+            st.error("La collection n'est pas créée. Merci d'ajouter votre token via la page 'Home'.")  
 
 
 if __name__ == "__main__":
