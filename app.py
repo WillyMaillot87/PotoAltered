@@ -9,7 +9,7 @@ from get_cards_data import get_cards_data
 from get_csv_data import get_csv
 from get_csv_collection import get_csv_collec
 from get_all_data import get_dataframes
-from utils import dump_json, create_folder_if_not_exists
+from utils import dump_json, create_folder_if_not_exists, create_or_read_file
 from os.path import join
 
 # Parameters
@@ -43,8 +43,7 @@ ALL_CARDS_PATH = "data/cards_fr.csv"
 MY_COLLECTION_PATH = "data/collection_fr.csv"
 CSV_ALL_OUTPUT_PATH = "data/global_vision.csv"
 
-with open("token.txt", "r") as f:
-    saved_token = f.read()
+saved_token = create_or_read_file("token.txt")
 
 st.set_page_config(
     page_title= "PotoAltered",

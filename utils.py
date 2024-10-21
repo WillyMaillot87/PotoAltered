@@ -60,3 +60,21 @@ def load_json(filename):
 def load_txt(filename):
     with open(filename, encoding="utf8") as f:
         return f.read()
+    
+def create_or_read_file(filename):
+  """Crée un fichier s'il n'existe pas et lit son contenu.
+
+  Args:
+    filename: Le nom du fichier.
+
+  Returns:
+    Le contenu du fichier, ou une chaîne vide si le fichier est nouveau.
+  """
+
+  if not os.path.exists(filename):
+    with open(filename, "w") as f:
+      # Écrire un contenu par défaut si besoin
+      f.write("")
+  
+  with open(filename, "r") as f:
+    return f.read()
