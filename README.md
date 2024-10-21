@@ -11,17 +11,22 @@ This app offers a comprehensive solution for tracking your **Altered** collectio
 
 ## How to use
 
-**Pull the docker image**
+Choose one of the two options :
 
+1. **From the website**
+
+URL : 
+[https://potoaltered.streamlit.app/](https://potoaltered.streamlit.app/)
+
+2. **Run the docker**
+
+Pull the docker image : 
 `docker pull willymaillot87/potoaltered:v1.0`
 
-
-**Run the docker app**
-
+Run the docker app: 
 `docker run -p 8501:8501 willymaillot87/potoaltered:v1.0`
 
+Connect to http://localhost:8501/ on your browser.
 
-**Use the app** 
 
-* Connect to http://localhost:8501/ on your browser.
-* **First time users:** You'll need to obtain a token to download your collection.
+
