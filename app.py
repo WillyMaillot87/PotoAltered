@@ -52,7 +52,7 @@ st.set_page_config(
                  page_icon=":sparkles:",
                  menu_items={
         'Get Help': 'mailto:w_saturnin@gmail.com',
-        'Report a bug': "mailto:w_saturnin@gmail.com",
+        'Report a bug': "https://github.com/WillyMaillot87/PotoAltered/issues",
         'About': "# PotoAltered. \n Une app très cool faite par Willy Maillot"}
         )
 
