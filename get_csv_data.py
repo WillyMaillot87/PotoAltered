@@ -21,7 +21,7 @@ import csv
 import itertools
 from utils import load_json
 
-def main():
+def get_csv():
     if not os.path.exists(CARDS_DATA_PATH):
         print(f"File {CARDS_DATA_PATH} not found. Have you run get_cards_data.py?")
         return
@@ -172,4 +172,4 @@ def get_subtypes_cols(data):
     return subtypes_cols
 
 if __name__ == "__main__":
-    main()
+    get_csv()

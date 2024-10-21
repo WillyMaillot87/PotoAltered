@@ -8,7 +8,7 @@ import numpy as np
 #PARAMETERS
 ALL_CARDS_PATH = "data/cards_fr.csv"
 MY_COLLECTION_PATH = "data/collection_fr.csv"
-CSV_OUTPUT_PATH = "data/global_vision.csv"
+CSV_ALL_OUTPUT_PATH = "data/global_vision.csv"
 
 def check_KS(id):
     '''Identify the Kickstarter edition'''
@@ -169,8 +169,8 @@ def get_dataframes(all_cards_path, my_collection_path):
 
     # df = df.rename(columns = new_names_fr)
 
-    df.to_csv(CSV_OUTPUT_PATH, index=False)
-    print(f"The dataframe 'global_vision'  {df.shape} is ready ({CSV_OUTPUT_PATH})")
+    df.to_csv(CSV_ALL_OUTPUT_PATH, index=False)
+    print(f"The dataframe 'global_vision'  {df.shape} is ready ({CSV_ALL_OUTPUT_PATH})")
 
 if __name__ == "__main__":
     get_dataframes(ALL_CARDS_PATH, MY_COLLECTION_PATH)

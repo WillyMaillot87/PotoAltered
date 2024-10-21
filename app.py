@@ -1,9 +1,49 @@
 import streamlit as st
-from streamlit_option_menu import option_menu
 import pandas as pd
 import os
 import subprocess
+import plotly.express as px
 
+from streamlit_option_menu import option_menu
+from get_cards_data import get_cards_data
+from get_csv_data import get_csv
+from get_csv_collection import get_csv_collec
+from get_all_data import get_dataframes
+from utils import dump_json, create_folder_if_not_exists, create_or_read_file
+from os.path import join
+
+# Parameters
+LANGUAGES = ["fr"]
+DUMP_TEMP_FILES = False
+OUTPUT_FOLDER = "data"
+TEMP_FOLDER = "temp"
+INCLUDE_PROMO_CARDS = False
+INCLUDE_UNIQUES = False
+INCLUDE_KS = True
+FORCE_INCLUDE_KS_UNIQUES = False 
+INCLUDE_FOILERS = False
+SKIP_NOT_ALL_LANGUAGES = False
+COLLECTION_TOKEN=None
+
+NAME_LANGUAGES = ["fr"]
+ABILITIES_LANGUAGES = ["fr"]
+MAIN_LANGUAGE = "fr"
+GROUP_SUBTYPES = False
+INCLUDE_WEB_ASSETS = False
+
+CARDS_DATA_PATH = "data/cards.json"
+COLLECTION_DATA_PATH = "data/collection.json"
+FACTIONS_DATA_PATH = "data/factions.json"
+TYPES_DATA_PATH = "data/types.json"
+SUBTYPES_DATA_PATH = "data/subtypes.json"
+RARITIES_DATA_PATH = "data/rarities.json"
+CSV_OUTPUT_PATH = "data/cards_" + MAIN_LANGUAGE + ".csv"
+CSV_COLLEC_OUTPUT_PATH = "data/collection_" + MAIN_LANGUAGE + ".csv"
+ALL_CARDS_PATH = "data/cards_fr.csv"
+MY_COLLECTION_PATH = "data/collection_fr.csv"
+CSV_ALL_OUTPUT_PATH = "data/global_vision.csv"
+
+saved_token = create_or_read_file("token.txt")
 
 st.set_page_config(
     page_title= "PotoAltered",
@@ -11,17 +51,35 @@ st.set_page_config(
                  page_icon=":sparkles:",
                  menu_items={
         'Get Help': 'mailto:w_saturnin@gmail.com',
-        'Report a bug': "mailto:w_saturnin@gmail.com",
+        'Report a bug': "https://github.com/WillyMaillot87/PotoAltered/issues",
         'About': "# PotoAltered. \n Une app très cool faite par Willy Maillot"}
         )
 
-# add new and/or renamed tab in this ordered dict by
-# passing the name in the sidebar as key and the imported tab
-# as value as follow :
-
-def run_script():
+def run_script(saved_token):
     try :
-        subprocess.run(['bash', 'run_all.sh'])
+        #get_cards_data :
+        cards, types, subtypes, factions, rarities = get_cards_data()
+        create_folder_if_not_exists(OUTPUT_FOLDER)
+        dump_json(cards,    join(OUTPUT_FOLDER, 'cards.json'))
+        dump_json(types,    join(OUTPUT_FOLDER, 'types.json'))
+        dump_json(subtypes, join(OUTPUT_FOLDER, 'subtypes.json'))
+        dump_json(factions, join(OUTPUT_FOLDER, 'factions.json'))
+        dump_json(rarities, join(OUTPUT_FOLDER, 'rarities.json'))
+
+        #get_collection_data :
+        collection, types, subtypes, factions, rarities = get_cards_data(collection_token=saved_token)
+        create_folder_if_not_exists(OUTPUT_FOLDER)
+        dump_json(collection,    join(OUTPUT_FOLDER, 'collection.json'))
+
+        #get_csv_data :
+        get_csv()
+
+        #get_csv_collection :
+        get_csv_collec()
+
+        #get_all_data
+        get_dataframes(ALL_CARDS_PATH, MY_COLLECTION_PATH)
+
         st.success("Le chargement de la collection est terminé.")
     except subprocess.CalledProcessError as e:
         st.error(f"Erreur lors de l'execution du script : {e}")
@@ -72,6 +130,8 @@ Ne communiques ton token à personne !
                     f.write(input_token)
                 st.write("Token sauvegardé")
 
+                with open("token.txt", "r") as f:
+                    saved_token = f.read()
             # # Bouton pour enregistrer le token dans le fichier .env et pour lancer les scripts
             # if submit:
             #     # Écrire le token dans le fichier .env
@@ -80,10 +140,10 @@ Ne communiques ton token à personne !
             #     st.write("Token sauvegardé !")
 
                 # Executer les scripts
-                run_script()
+                run_script(saved_token)
 
         with col2 :
-            st.image("PotoAltered.png", width=800)
+            st.image("images/PotoAltered.png", width=800)
 
 
 ### COLLECTION PAGE ###
@@ -155,7 +215,7 @@ Ne communiques ton token à personne !
                     width = "small"
                     ),
                 }
-        
+
             filter_col, df_col = st.columns([1, 4])
             
             with filter_col :
@@ -280,9 +340,45 @@ Ne communiques ton token à personne !
             # st.dataframe(second_df, column_config=column_configuration, use_container_width=True)
         
 
+            st.header("Statistiques : ")
+            stats, graph = st.columns([1, 2], vertical_alignment="center")
+            
+            shape_all = df.shape[0]
+            shape_collec = df[df['En possession'] > 0].shape[0]
+
+            with stats :
+                st.markdown(f"**{shape_all}** cartes à collectionner")
+                st.markdown(f"**{shape_collec}** cartes dans la collection")
+                st.markdown(f"Collection complétée à **{(shape_collec / shape_all) * 100:.2f}** %")
+
+            # Barplot :
+            df_barplot = df[['Type','Rareté','En possession', 'En excès', 'Manquantes']]
+            df_barplot['Max Deck'] = (df['En possession'] + df['Manquantes']) - df['En excès']
+
+            df_barplot['Progression'] = (df_barplot['En possession'] - df_barplot['En excès']) / df_barplot['Max Deck']
+            df_barplot = df_barplot.groupby(['Rareté', 'Type'])['Progression'].mean().reset_index()
+            df_barplot = df_barplot.query("Type in ['Héros', 'Personnage', 'Sort', 'Permanent']")
+
+            fig = px.bar(df_barplot, 
+                        x='Progression', 
+                        y='Rareté', 
+                        color='Type', 
+                        barmode='group',
+                        text=df_barplot['Progression'].apply(lambda x: f"{x:.2%}")          
+                        )
+
+            fig.update_layout(barcornerradius=15,
+                            #   showlegend=False,
+                              xaxis_title=None,
+                              yaxis_title=None,
+                              height=350,
+                              legend=dict(
+                                y=0.5, x=-0.2  # Ajustez la valeur pour positionner la légende plus haut ou plus bas
+                            ))
 
 
-
+            with graph :
+                st.plotly_chart(fig, use_container_width=True, theme="streamlit")
 
         else :
             st.error("La collection n'est pas créée. Merci d'ajouter votre token via la page 'Home'.")    
