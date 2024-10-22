@@ -431,7 +431,7 @@ Ne communiques ton token à personne !
                 st.download_button(
                     "Press to Download",
                     csv,
-                    name_user + "_cartes_altered.csv",
+                    "cartes_de_" + name_user + ".csv",
                     "text/csv",
                     key='download-csv',
                     type="primary"
@@ -446,6 +446,8 @@ Ne communiques ton token à personne !
             
 
         if csv_poto is not None:
+            file_name = csv_poto.name
+            name_poto = file_name[10:-4]
 
             with right2 :
                 df_poto = pd.read_csv(csv_poto)
@@ -456,6 +458,9 @@ Ne communiques ton token à personne !
                 column_order=column_order,
                 use_container_width=True,
                 hide_index=True)
+            
+                st.button(f"Voir les cartes tradables de {name_poto}")
+
 
 if __name__ == "__main__":
     run()
