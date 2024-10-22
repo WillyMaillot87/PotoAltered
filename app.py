@@ -84,73 +84,78 @@ def run_script(saved_token):
     except subprocess.CalledProcessError as e:
         st.error(f"Erreur lors de l'execution du script : {e}")
 
-def create_dataframe() :
-    if os.path.isfile("data/global_vision.csv") :
-                df = pd.read_csv("data/global_vision.csv")    
-
-                df['Forest-Mountain-Water'] = df[['forestPower', 'mountainPower', 'waterPower']].apply(lambda x: list(x), axis=1)
-
-                new_names_fr = {'name_fr' : 'Nom',
-                                'faction' : 'Faction', 
-                                'collectorNumber' : 'Numéro',
-                                'type' : 'Type', 
-                                'rarity' : 'Rareté',
-                                'handCost' : 'Coût de main', 
-                                'reserveCost' : 'Coût de réserve', 
-                                'Forest-Mountain-Water' : 'Forêt-Montagne-Eau',
-                                'forestPower' : 'Fôret', 
-                                'mountainPower' : 'Montagne', 
-                                'waterPower' : 'Eau', 
-                                'abilities_fr' : 'Capacité',
-                                'supportAbility_fr' : 'Capacité de soutien',
-                                'imagePath' : 'Image', 
-                                'inMyCollection' : 'En possession', 
-                                'Kickstarter' : 'Dont KS', 
-                                'to_give' : 'En excès', 
-                                'to_get' : 'Manquantes',
-                                'progress' : 'Complétion'
-                                }
-
-                df = df.rename(columns = new_names_fr)
-
-                column_order = ('Image',
-                                'Nom',
-                                'Faction',
-                                'Type', 
-                                'Rareté',
-                                'En possession',
-                                'Dont KS',
-                                'En excès', 
-                                'Manquantes',
-                                'Complétion',
-                                'Coût de main', 
-                                'Coût de réserve', 
-                                'Forêt-Montagne-Eau',
-                                # 'Fôret', 
-                                # 'Montagne', 
-                                # 'Eau', 
-                                'Capacité',
-                                'Capacité de soutien',
-                                'Numéro'
-                                )
-
-                column_configuration = {
-                    'Complétion' : st.column_config.ProgressColumn(
-                        "Complétion",
-                        help="Progression sur l'atteinte du maximum par deck pour cette carte",
-                        format="%d%%",
-                        min_value=0,
-                        max_value=100
-                    ),
-                    'Image': st.column_config.ImageColumn(
-                        "Image", 
-                        help="Aperçut de la carte. Double cliquer pour agrandir.",
-                        width = "small"
-                        ),
-                    }
+def create_dataframe(csv_path):
+    if os.path.isfile(csv_path) :
+        df = pd.read_csv(csv_path)
     else :
-        st.error("La collection n'est pas créée. Merci d'ajouter votre token via la page 'Home'.")  
+        st.error("La collection n'est pas créée. Merci d'ajouter votre token via la page 'Home'.")
+    return df
 
+def transform_dataframe(df) :   
+    columns_power = ['forestPower', 'mountainPower', 'waterPower']
+
+    if all(column in df.columns for column in columns_power) :
+        df['Forest-Mountain-Water'] = df[['forestPower', 'mountainPower', 'waterPower']].apply(lambda x: list(x), axis=1)
+
+    new_names_fr = {'name_fr' : 'Nom',
+                    'faction' : 'Faction', 
+                    'collectorNumber' : 'Numéro',
+                    'type' : 'Type', 
+                    'rarity' : 'Rareté',
+                    'handCost' : 'Coût de main', 
+                    'reserveCost' : 'Coût de réserve', 
+                    'Forest-Mountain-Water' : 'Forêt-Montagne-Eau',
+                    'forestPower' : 'Fôret', 
+                    'mountainPower' : 'Montagne', 
+                    'waterPower' : 'Eau', 
+                    'abilities_fr' : 'Capacité',
+                    'supportAbility_fr' : 'Capacité de soutien',
+                    'imagePath' : 'Image', 
+                    'inMyCollection' : 'En possession', 
+                    'Kickstarter' : 'Dont KS', 
+                    'to_give' : 'En excès', 
+                    'to_get' : 'Manquantes',
+                    'progress' : 'Complétion'
+                    }
+
+    df = df.rename(columns = new_names_fr)
+
+    column_order = ('Image',
+                    'Nom',
+                    'Faction',
+                    'Type', 
+                    'Rareté',
+                    'En possession',
+                    'Dont KS',
+                    'En excès', 
+                    'Manquantes',
+                    'Complétion',
+                    'Coût de main', 
+                    'Coût de réserve', 
+                    'Forêt-Montagne-Eau',
+                    # 'Fôret', 
+                    # 'Montagne', 
+                    # 'Eau', 
+                    'Capacité',
+                    'Capacité de soutien',
+                    'Numéro'
+                    )
+
+    column_configuration = {
+        'Complétion' : st.column_config.ProgressColumn(
+            "Complétion",
+            help="Progression sur l'atteinte du maximum par deck pour cette carte",
+            format="%d%%",
+            min_value=0,
+            max_value=100
+        ),
+        'Image': st.column_config.ImageColumn(
+            "Image", 
+            help="Aperçut de la carte. Double cliquer pour agrandir.",
+            width = "small"
+            ),
+        }
+  
     return df, column_order, column_configuration
 
 def run():
@@ -218,6 +223,9 @@ Ne communiques ton token à personne !
 ### COLLECTION PAGE ###
     if selected == "Collection" : 
 
+        df = create_dataframe(CSV_ALL_OUTPUT_PATH)
+        df, column_order, column_configuration = transform_dataframe(df)
+
         filter_col, df_col = st.columns([1, 4])
         
         with filter_col :
@@ -243,7 +251,7 @@ Ne communiques ton token à personne !
             
             columns_to_select = columns_cat + columns_string + columns_int + columns_float
 
-            st.header(f"Filtres : ")
+            st.subheader(f"Filtres")
 
             df = df.copy()
 
@@ -325,9 +333,7 @@ Ne communiques ton token à personne !
                 )
 
         with df_col :
-            st.header("Collection")
-
-            df, column_order, column_configuration = create_dataframe()
+            st.subheader("Collection")
 
             st.dataframe(df,
             column_config=column_configuration,
@@ -345,7 +351,7 @@ Ne communiques ton token à personne !
         # st.dataframe(second_df, column_config=column_configuration, use_container_width=True)
     
 
-        st.header("Statistiques : ")
+        st.subheader("Statistiques", divider = 'gray')
         stats, graph = st.columns([1, 2], vertical_alignment="center")
         
         shape_all = df.shape[0]
@@ -388,8 +394,10 @@ Ne communiques ton token à personne !
 
 ### TRADABLE PAGE ###     
     if selected == "Tradable" : 
-
-        df, column_order, column_configuration = create_dataframe()
+        
+        df = create_dataframe(CSV_ALL_OUTPUT_PATH)
+        df, column_order, column_configuration = transform_dataframe(df)
+        
         df_collection = df[df['En possession'] > 0].copy()
         df_collection.drop(['Coût de main',
                             'Dont KS',
@@ -401,14 +409,53 @@ Ne communiques ton token à personne !
                             axis=1,
                             inplace=True)
 
-        left, right = st.columns([1, 1])
+        left, right = st.columns(2)
+        left2, right2 = st.columns(2)
 
-        left.subheader("Mes cartes :")
-        left.dataframe(df_collection,
+        left.subheader("Mes cartes :", divider = 'gray')
+
+        right.subheader("Les cartes du poto :", divider = 'gray')
+        csv_poto = right.file_uploader("dépose le .csv de ton poto ici", label_visibility="collapsed")
+
+        with left :
+            name_user = st.text_input("Indique ton nom pour télécharger ton fichier :")
+            
+            if name_user is not "" :
+                # Download
+                @st.cache_data
+                def convert_df(df):
+                    return df.to_csv(index=False).encode('utf-8')
+                
+                csv = convert_df(df_collection)
+
+                st.download_button(
+                    "Press to Download",
+                    csv,
+                    name_user + "_cartes_altered.csv",
+                    "text/csv",
+                    key='download-csv',
+                    type="primary"
+                    )
+        
+        with left2 :
+            st.dataframe(df_collection,
             column_config=column_configuration,
             column_order=column_order,
             use_container_width=True,
             hide_index=True)
+            
+
+        if csv_poto is not None:
+
+            with right2 :
+                df_poto = pd.read_csv(csv_poto)
+                df_poto, column_order, column_configuration = transform_dataframe(df_poto)
+                
+                st.dataframe(df_poto,
+                column_config=column_configuration,
+                column_order=column_order,
+                use_container_width=True,
+                hide_index=True)
 
 if __name__ == "__main__":
     run()
