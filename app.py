@@ -388,6 +388,24 @@ Ne communiques ton token à personne !
         st.header("En construction :building_construction:")
 
 
+        df_collection = df[df['En possession'] > 0].copy()
+        df_collection.drop(['Coût de main',
+                            'Coût de réserve',
+                            'Fôret-Montagne-Eau',
+                            'Capacité',
+                            'Capacité de soutien',
+                            'Numéro'],
+                            axis=1,
+                            inplace=True)
+
+        left, right = st.columns([1, 1])
+
+        with left:
+            st.dataframe(df_collection,
+                column_config=column_configuration,
+                column_order=column_order,
+                use_container_width=True,
+                hide_index=True)
 
 if __name__ == "__main__":
     run()
