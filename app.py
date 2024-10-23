@@ -48,7 +48,7 @@ saved_token = create_or_read_file("token.txt")
 st.set_page_config(
     page_title= "PotoAltered",
                  layout="wide",
-                 page_icon=":sparkles:",
+                 page_icon=":material/playing_cards:",
                  menu_items={
         'Get Help': 'mailto:w_saturnin@gmail.com',
         'Report a bug': "https://github.com/WillyMaillot87/PotoAltered/issues",
@@ -363,7 +363,7 @@ Ne communiques ton token à personne !
             st.markdown(f"Collection complétée à **{(shape_collec / shape_all) * 100:.2f}** %")
 
         # Barplot :
-        df_barplot = df[['Type','Rareté','En possession', 'En excès', 'Manquantes']]
+        df_barplot = df[['Type','Rareté','En possession', 'En excès', 'Manquantes']].copy()
         df_barplot['Max Deck'] = (df['En possession'] + df['Manquantes']) - df['En excès']
 
         df_barplot['Progression'] = (df_barplot['En possession'] - df_barplot['En excès']) / df_barplot['Max Deck']
@@ -417,10 +417,14 @@ Ne communiques ton token à personne !
         right.subheader("Les cartes du poto :", divider = 'gray')
         csv_poto = right.file_uploader("dépose le .csv de ton poto ici", label_visibility="collapsed")
 
+        if "name_user" not in st.session_state:
+            st.session_state["name_user"] = ""
+
         with left :
-            name_user = st.text_input("Indique ton nom pour télécharger ton fichier :")
+            st.text_input("Indique ton nom pour télécharger ton fichier :", key="name_user")
             
-            if name_user is not "" :
+            
+            if st.session_state.name_user != "" :
                 # Download
                 @st.cache_data
                 def convert_df(df):
@@ -431,18 +435,28 @@ Ne communiques ton token à personne !
                 st.download_button(
                     "Press to Download",
                     csv,
-                    "cartes_de_" + name_user + ".csv",
+                    "cartes_de_" + st.session_state.name_user + ".csv",
                     "text/csv",
                     key='download-csv',
                     type="primary"
                     )
         
         with left2 :
+            cards_count, cards_tot = st.columns(2)
+            nb_cards_user = df_collection['En possession'].sum()
+            nb_cards_unique_user = df_collection['En possession'][df_collection['En possession']>0].copy().count()
+            cards_count.write(f"Nombre de cartes différentes : **{nb_cards_unique_user}**")
+            cards_tot.write(f"Nombre de cartes totales : **{nb_cards_user}**")
+            
+
             st.dataframe(df_collection,
             column_config=column_configuration,
             column_order=column_order,
             use_container_width=True,
             hide_index=True)
+
+            
+
             
 
         if csv_poto is not None:
@@ -453,13 +467,26 @@ Ne communiques ton token à personne !
                 df_poto = pd.read_csv(csv_poto)
                 df_poto, column_order, column_configuration = transform_dataframe(df_poto)
                 
+                cards_count, cards_tot = st.columns(2)
+                nb_cards_poto = df_poto['En possession'].sum()
+                nb_cards_unique_poto = df_poto['En possession'][df_poto['En possession']>0].copy().count()
+                cards_count.write(f"Nombre de cartes différentes : **{nb_cards_unique_poto}**")
+                cards_tot.write(f"Nombre de cartes totales : **{nb_cards_poto}**")
+
                 st.dataframe(df_poto,
                 column_config=column_configuration,
                 column_order=column_order,
                 use_container_width=True,
                 hide_index=True)
-            
-                st.button(f"Voir les cartes tradables de {name_poto}")
+
+            left, center, right = st.columns(3)
+            if center.button(label = f"Voir les cartes échangeables avec {name_poto}", use_container_width=True, type = 'primary'):
+
+                left3, right3 = st.columns(2)
+                left3.subheader(f"Tu peux donner ces XX cartes à {name_poto} :", divider = 'red')
+
+                right3.subheader(f"{name_poto} peut te donner ces XX cartes :", divider = 'blue')
+    
 
 
 if __name__ == "__main__":
