@@ -55,6 +55,16 @@ st.set_page_config(
         'About': "# PotoAltered. \n Une app très cool faite par Willy Maillot"}
         )
 
+#Cacher le bouton 'view fullscreen' des images :
+hide_img_fs = '''
+<style>
+button[title="View fullscreen"]{
+    visibility: hidden;}
+</style>
+'''
+
+st.markdown(hide_img_fs, unsafe_allow_html=True)
+
 def run_script(saved_token):
     try :
         #get_cards_data :
@@ -172,7 +182,7 @@ def show_trades(df_give, df_get):
     df_result = df_merge[['Image','Nom', 'Faction', 'Rareté', 'Type', 'En excès', 'Manquantes_get']].copy()
     df_result['Nombre d\'exemplaires'] = df_merge[['En excès', 'Manquantes_get']].min(axis=1)
     df_result = df_result[df_result['Nombre d\'exemplaires'] > 0]
-    #df_result.drop(['En excès', 'Manquantes_get'], axis=1, inplace=True)
+    df_result.drop(['En excès', 'Manquantes_get'], axis=1, inplace=True)
 
     return df_result
 
@@ -379,7 +389,7 @@ Ne communiques ton token à personne !
             st.markdown(f"**{shape_all}** cartes à collectionner")
             st.markdown(f"**{shape_collec}** cartes dans la collection")
             st.markdown(f"Collection complétée à **{(shape_collec / shape_all) * 100:.2f}** %")
-        
+
         # Barplot :
         df_barplot = df[['Type','Rareté','En possession', 'En excès', 'Manquantes']].copy()
         df_barplot['Max Deck'] = (df['En possession'] + df['Manquantes']) - df['En excès']
