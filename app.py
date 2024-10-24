@@ -55,6 +55,16 @@ st.set_page_config(
         'About': "# PotoAltered. \n Une app très cool faite par Willy Maillot"}
         )
 
+#Cacher le bouton 'view fullscreen' des images :
+hide_img_fs = '''
+<style>
+button[title="View fullscreen"]{
+    visibility: hidden;}
+</style>
+'''
+
+st.markdown(hide_img_fs, unsafe_allow_html=True)
+
 def run_script(saved_token):
     try :
         #get_cards_data :
