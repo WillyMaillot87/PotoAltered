@@ -158,6 +158,24 @@ def transform_dataframe(df) :
   
     return df, column_order, column_configuration
 
+def show_trades(df_give, df_get):
+    df_give = df_give[df_give['En excès'] > 0].copy()
+
+    df_merge = pd.merge(df_give, df_get[['id','Manquantes']], how='left', on='id', suffixes = ('_give', '_get'))
+
+    df_merge['max_card'] = df_merge['Type'].apply(lambda x: 1 if x == 'Héros' else 3) 
+    
+    df_merge.fillna({'Manquantes_get' : df_merge['max_card']}, inplace=True)
+
+    df_merge['Manquantes_get'] = df_merge['Manquantes_get'].astype(int)
+
+    df_result = df_merge[['Image','Nom', 'Faction', 'Rareté', 'Type', 'En excès', 'Manquantes_get']].copy()
+    df_result['Nombre d\'exemplaires'] = df_merge[['En excès', 'Manquantes_get']].min(axis=1)
+    df_result = df_result[df_result['Nombre d\'exemplaires'] > 0]
+    #df_result.drop(['En excès', 'Manquantes_get'], axis=1, inplace=True)
+
+    return df_result
+
 def run():
 ### MENU ###
     selected = option_menu(
@@ -225,7 +243,7 @@ Ne communiques ton token à personne !
 
         df = create_dataframe(CSV_ALL_OUTPUT_PATH)
         df, column_order, column_configuration = transform_dataframe(df)
-
+        df_all = df.copy()
         filter_col, df_col = st.columns([1, 4])
         
         with filter_col :
@@ -350,18 +368,18 @@ Ne communiques ton token à personne !
         # st.header(f"Cartes sélectionnées : {len(cards)}")
         # st.dataframe(second_df, column_config=column_configuration, use_container_width=True)
     
-
+#### STATISTIQUES #####
         st.subheader("Statistiques", divider = 'gray')
         stats, graph = st.columns([1, 2], vertical_alignment="center")
         
-        shape_all = df.shape[0]
+        shape_all = df_all.shape[0]
         shape_collec = df[df['En possession'] > 0].shape[0]
 
         with stats :
             st.markdown(f"**{shape_all}** cartes à collectionner")
             st.markdown(f"**{shape_collec}** cartes dans la collection")
             st.markdown(f"Collection complétée à **{(shape_collec / shape_all) * 100:.2f}** %")
-
+        
         # Barplot :
         df_barplot = df[['Type','Rareté','En possession', 'En excès', 'Manquantes']].copy()
         df_barplot['Max Deck'] = (df['En possession'] + df['Manquantes']) - df['En excès']
@@ -479,14 +497,38 @@ Ne communiques ton token à personne !
                 use_container_width=True,
                 hide_index=True)
 
+            df_get = show_trades(df_poto, df_collection)
+            df_give = show_trades(df_collection, df_poto)
+            nb_to_get = df_get.shape[0]
+            nb_to_give = df_give.shape[0]
+
+            df_get, column_order, column_configuration = transform_dataframe(df_get)
+
             left, center, right = st.columns(3)
             if center.button(label = f"Voir les cartes échangeables avec {name_poto}", use_container_width=True, type = 'primary'):
 
-                left3, right3 = st.columns(2)
-                left3.subheader(f"Tu peux donner ces XX cartes à {name_poto} :", divider = 'red')
+                left3, center3, right3 = st.columns([2, 1, 2])
+                left3.subheader(f"Tu peux donner ces {nb_to_give} cartes à {name_poto} :", divider = 'red')
+                left3.dataframe(df_give,
+                column_config={'Image': st.column_config.ImageColumn(
+                                "Image", 
+                                help="Aperçut de la carte. Double cliquer pour agrandir.",
+                                width = "small"
+                                )},
+                use_container_width=True,
+                hide_index=True)
 
-                right3.subheader(f"{name_poto} peut te donner ces XX cartes :", divider = 'blue')
-    
+                center3.image("images/trade.jpg")
+
+                right3.subheader(f"{name_poto} peut te donner ces {nb_to_get} cartes :", divider = 'blue')
+                right3.dataframe(df_get,
+                column_config={'Image': st.column_config.ImageColumn(
+                                "Image", 
+                                help="Aperçut de la carte. Double cliquer pour agrandir.",
+                                width = "small"
+                                )},
+                use_container_width=True,
+                hide_index=True)
 
 
 if __name__ == "__main__":
